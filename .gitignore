@@ -1,8 +1,8 @@
 /*
 !/gradle
-!/src/*
+!/src
 !.gitignore
-!build.grade
+!build.gradle
 !gradlew
 !gradlew.bat
 !LICENSE
