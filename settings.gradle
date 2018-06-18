@@ -1,2 +1,4 @@
-rootProject.name = 'projectk'
+rootProject.name = 'Newton'
+include 'NewtonAPI'
+findProject(':NewtonAPI')?.name = 'NewtonAPI'
 
