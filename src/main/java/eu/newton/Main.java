@@ -1,43 +1,41 @@
 package eu.newton;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.script.ScriptException;
 import java.math.BigDecimal;
-import java.util.function.Function;
 
 
 public class Main {
 
+    private static final Logger logger = LogManager.getLogger(BetterParser.class);
+
     public static void main(String[] args) {
 
-        BetterParser parser = new BetterParser();
-        final String f = "x^sin(x)^x";
+        final String f = "sin(x)+x";
 
-
-        BigDecimal result = null;
         try {
-            IMathFunction plzdontdothisathome = parser.parse(f);
+            MathFunction function = new MathFunction(f);
+
+            BigDecimal result = null;
+
             try {
-                //result = plzdontdothisathome.differentiate(k(2), 1);
-                result = plzdontdothisathome.evaluate(k(2.0));
+                result = function.evaluate(k(2));
             } catch (NumberFormatException | ArithmeticException ex) {
-                System.err.println("Are you retarded ? ");
-                System.err.println(ex.getMessage());
+                logger.error("Are you retarded ? ");
+                logger.error(ex.getMessage());
             } catch (Exception ex) {
-                System.err.println("Stop it java");
-                System.err.println(ex.getMessage());
-                ex.printStackTrace();
-
+                logger.error("Stop it java");
+                logger.error(ex.getMessage());
             }
-        } catch (Exception ex) {
-            System.err.println("Good job, you won. Now fuck off ");
-            System.err.println(ex.getMessage());
 
+            logger.debug("RESULT: {}", result);
 
+        } catch (ScriptException e) {
+            logger.error("Good job, you won. Now fuck off ");
+            logger.error(e.getMessage());
         }
-
-        System.out.println("RESULT: " + result);
 
     }
 
