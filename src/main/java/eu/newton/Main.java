@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        final String f = "sin(x)+x";
+        final String f = "sqrt(x^x)";
 
         try {
             MathFunction function = new MathFunction(f);
@@ -21,7 +21,7 @@ public class Main {
             BigDecimal result = null;
 
             try {
-                result = function.evaluate(k(2));
+                result = function.evaluate(k(2.5));
             } catch (NumberFormatException | ArithmeticException ex) {
                 logger.error("Are you retarded ? ");
                 logger.error(ex.getMessage());
@@ -38,8 +38,6 @@ public class Main {
         }
 
     }
-
-
 
 
     public static BigDecimal k(double d) {
