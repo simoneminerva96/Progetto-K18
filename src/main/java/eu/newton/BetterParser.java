@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,10 +41,8 @@ public class BetterParser {
 
         String function = theTrueParsing(list);
 
-        ScriptEngine engine = new ScriptEngineManager(null).getEngineByName("nashorn");
-
         @SuppressWarnings("unchecked")
-        Function<BigDecimal,BigDecimal>  f = (Function<BigDecimal, BigDecimal>) engine.eval(String.format("new java.util.function.Function(function(x) %s)", function));
+        Function<BigDecimal,BigDecimal>  f = (Function<BigDecimal, BigDecimal>) Nashorn.getInstance().eval(String.format("new java.util.function.Function(function(x) %s)", function));
 
         return f;
 
