@@ -129,6 +129,12 @@ public class BetterParser {
             while (it.hasNext()) {
                 current = it.next();
 
+                if (current.startsWith("java.lang.Math.")) {
+                    current = "java.math.BigDecimal.valueOf(" + current + ")";
+                    it.set(current);
+                    logger.trace("NEW CURRENT: {}", current);
+                }
+
                 if (it.hasNext()) {
                     op = it.next();
 
@@ -233,8 +239,18 @@ public class BetterParser {
 
         char c = s.charAt(0);
 
-        if (c == '*' || c == '/' || c == '+' || c == '-' || c == '^') {
+        if (c == '*' || c == '/' || c == '+' || c == '-' || c == '^' || c == 'x') {
             return 1;
+        }
+
+        if (Character.isDigit(c)) {
+            for (int i = 1; i < s.length(); i++) {
+                char d = s.charAt(i);
+                if (!Character.isDigit(d) && d != '.') {
+                    return i;
+                }
+            }
+            return s.length();
         }
 
         if (Character.isDigit(c) || c == 'x') {
