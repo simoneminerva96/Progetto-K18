@@ -14,13 +14,13 @@ import static eu.newton.Main.k;
 
 public final class MathFunction implements IFunction<BigDecimal>, IDifferentiable<BigDecimal> {
 
-    private static final Logger logger = LogManager.getLogger(BetterParser.class);
+    private static final Logger logger = LogManager.getLogger(FunctionParser.class);
     
     private final String function;
     private final Function<BigDecimal, BigDecimal> f;
 
     public MathFunction(String function) throws ScriptException {
-        this.f = new BetterParser().parse(function);
+        this.f = new FunctionParser().parse(function);
         this.function = function;
     }
 
