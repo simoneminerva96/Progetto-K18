@@ -47,8 +47,11 @@ public class FunctionParser {
 
         function = parseGroups(groups);
 
+        final String parserVar = "var parser = Packages.eu.newton.FunctionParser;";
+
         @SuppressWarnings("unchecked")
-        Function<BigDecimal,BigDecimal>  f = (Function<BigDecimal, BigDecimal>) Nashorn.getInstance().eval("new java.util.function.Function(function(x) " + function + ")");
+        Function<BigDecimal,BigDecimal>  f = (Function<BigDecimal, BigDecimal>)
+                Nashorn.getInstance().eval(parserVar + " new java.util.function.Function(function(x) " + function + ")");
 
         return f;
 
@@ -169,7 +172,7 @@ public class FunctionParser {
             if (c == '(') {
                 String f = replaceMathFunctions(group.substring(0, i));
                 logger.trace("MATHF: {}", f);
-                String parsed = f + '(' + parseGroups(getGroups(group.substring(i + 1, group.length() - 1))) + ".doubleValue())";
+                String parsed = f + "(parser.unwrap(" + parseGroups(getGroups(group.substring(i + 1, group.length() - 1))) + "))";
                 logger.trace("============BLOCK=============");
                 logger.trace("");
                 return "java.math.BigDecimal.valueOf(" + parsed + ')';
@@ -184,7 +187,7 @@ public class FunctionParser {
         logger.trace("");
         logger.trace("PARSING: {}", groups);
 
-        StringBuilder fuuu = new StringBuilder();
+        StringBuilder function = new StringBuilder();
         if (groups.size() != 1) {
             groups = fixThePow(groups);
             ListIterator<String> it = groups.listIterator();
@@ -224,17 +227,17 @@ public class FunctionParser {
 
             groups.forEach(s -> {
                 if (s.length() == 1) {
-                    fuuu.append(replaceBigMethods(s));
+                    function.append(replaceBigMethods(s));
                 } else {
-                    fuuu.append('(').append(s).append(')');
+                    function.append('(').append(s).append(')');
                 }
             });
 
         } else {
-            fuuu.append(groups.get(0));
+            function.append(groups.get(0));
         }
 
-        String ffs = fuuu.toString();
+        String ffs = function.toString();
 
         logger.trace("DONE: {}", ffs);
         logger.trace("");
@@ -245,7 +248,8 @@ public class FunctionParser {
     private List<String> fixThePow(List<String> list) {
         ListIterator<String> it = list.listIterator(list.size() - 1);
 
-        String current = it.next();
+        it.next();
+        String current;
         String op;
 
 
@@ -262,41 +266,15 @@ public class FunctionParser {
                 if (op.equals("^")) {
                     String to = it.previous();
 
-                    char open;
-                    char close;
+                    current = "parser.unwrap(" + current + ")";
+                    to = "parser.unwrap("  + to + ")";
 
-                    do {
-                        open = current.charAt(0);
-                        close = current.charAt(current.length() - 1);
 
-                        if (open == '(' && close == ')') {
-                            current = current.substring(1, current.length() - 1);
-                        }
-
-                    } while (open == '(' && close == ')');
-
-                    do {
-                        open = to.charAt(0);
-                        close = to.charAt(to.length() - 1);
-
-                        if (open == '(' && close == ')') {
-                            to = to.substring(1, to.length() - 1);
-                        }
-
-                    } while (open == '(' && close == ')');
-
-                    if (current.startsWith("java.math.BigDecimal")) {
-                        current = "(" + current + ")" + ".doubleValue()";
-                    }
-                    if (to.startsWith("java.math.BigDecimal")) {
-                        to = "(" + to + ")" + ".doubleValue()";
-                    }
-
-                    it.set("java.lang.Math.pow" + "(" + to + "," + current + ")");
+                    it.set("java.lang.Math.pow(" + to + ',' + current + ')');
                     it.next();
-                    logger.trace("PREVIOUS: {}", it.next());
+                    it.next();
                     it.remove();
-                    logger.trace("PREVIOUS: {}", it.next());
+                    it.next();
                     it.remove();
                 }
             }
@@ -354,5 +332,21 @@ public class FunctionParser {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static BigDecimal wrap(double d) {
+        return BigDecimal.valueOf(d);
+    }
+
+    public static BigDecimal wrap(BigDecimal bd) {
+        return bd;
+    }
+
+    public static double unwrap(double d) {
+        return d;
+    }
+
+    public static double unwrap(BigDecimal bd) {
+        return bd.doubleValue();
     }
 }
