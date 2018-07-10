@@ -156,7 +156,7 @@ public class FunctionParser {
             return '(' + parseNestedGroups(group) + ')';
         }
 
-        return replaceBigMethods(group); //Can we even get here ?
+        throw new IllegalArgumentException("Unsupported group");
 
     }
 
@@ -270,7 +270,7 @@ public class FunctionParser {
                     to = "parser.unwrap("  + to + ")";
 
 
-                    it.set("java.lang.Math.pow(" + to + ',' + current + ')');
+                    it.set("(parser.wrap(java.lang.Math.pow(" + to + ',' + current + ")))");
                     it.next();
                     it.next();
                     it.remove();

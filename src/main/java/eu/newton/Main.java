@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        final String f = "(-x+7)^sin(x)";
+        final String f = "(2^2^(x-2)^sin(x)^2+sqrt(3))^sin(3*x^2)";
 
         try {
             MathFunction function = new MathFunction(f);

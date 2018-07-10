@@ -14,7 +14,7 @@ import static eu.newton.Main.k;
 
 public final class MathFunction implements IFunction<BigDecimal>, IDifferentiable<BigDecimal> {
 
-    private static final Logger logger = LogManager.getLogger(FunctionParser.class);
+    private static final Logger logger = LogManager.getLogger(MathFunction.class);
     
     private final String function;
     private final Function<BigDecimal, BigDecimal> f;
