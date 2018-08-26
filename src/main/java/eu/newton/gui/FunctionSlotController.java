@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import eu.newton.MathFunction;
+import eu.newton.magic.exceptions.LambdaCreationException;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,38 +66,51 @@ public class FunctionSlotController implements Initializable {
     @FXML
     private void onToggle() {
         FunctionVBox box = ((FunctionVBox) this.derivative.getParent().getParent().getParent());
+        String last = this.function.getPrevious();
         if (this.toggle.getGraphic() == this.show) {
             this.toggle.setGraphic(this.hide);
-            box.getFunctions().remove(this.function.getPrevious());
+            box.getFunctions().remove(last);
         } else {
             this.toggle.setGraphic(this.show);
-            box.getFunctions().computeIfAbsent(this.function.getPrevious(), s -> {
+            MathFunction f = box.getFunctions().get(last);
+            if (f == null) {
                 try {
-                    return new MathFunction(s);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                    f = new MathFunction(last);
+                    box.getFunctions().put(last, f);
+                    this.function.setPrevious(last);
+                } catch (LambdaCreationException e) {
+                    this.function.setPrevious("");
+                    //TODO invalid function. (It's probably safe to ignore this)
+                } catch (IllegalArgumentException ex) {
+                    this.function.setPrevious("");
+                    //TODO invalid function. (It's probably safe to ignore this)
                 }
-            });
+            }
         }
     }
 
     @FXML
     private void onRefresh() {
-        if (this.toggle.getGraphic() == this.hide) {
+        String input = this.function.getText();
+        if (this.toggle.getGraphic() == this.hide || input.equals(this.function.getPrevious())) {
             return;
         }
         FunctionVBox box = ((FunctionVBox) this.derivative.getParent().getParent().getParent());
         box.getFunctions().remove(this.function.getPrevious());
-        box.getFunctions().computeIfAbsent(this.function.getText(), s -> {
+        MathFunction f = box.getFunctions().get(input);
+        if (f == null) {
             try {
-                return new MathFunction(s);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                f = new MathFunction(input);
+                box.getFunctions().put(input, f);
+                this.function.setPrevious(input);
+            } catch (LambdaCreationException e) {
+                this.function.setPrevious("");
+                //TODO invalid function
+            } catch (IllegalArgumentException ex) {
+                this.function.setPrevious("");
+                //TODO invalid function
             }
-        });
-        this.function.setPrevious(this.function.getText());
+        }
     }
 
     @FXML

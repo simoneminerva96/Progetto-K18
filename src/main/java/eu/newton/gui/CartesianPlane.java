@@ -54,7 +54,13 @@ public class CartesianPlane extends Pane {
 
     public void plot(MathFunction f) {
 
-        Path path = this.functions.computeIfAbsent(f, mathf -> new Int2ObjectOpenHashMap<>()).get(0);
+        Int2ObjectOpenHashMap<Path> map = this.functions.get(f);
+        Path path = null;
+        if (map == null) {
+            this.functions.put(f, new Int2ObjectOpenHashMap<>());
+        } else {
+            path = map.get(0);
+        }
         if (path == null) {
             path = new Path();
             path.setStroke(Color.ORANGE.deriveColor(0, 1, 1, 0.6));
@@ -78,8 +84,8 @@ public class CartesianPlane extends Pane {
                 x += X_INC;
             }
             this.functions.get(f).put(0, path);
+            getChildren().add(path);
         }
-        getChildren().add(path);
     }
 
     public void plot(MathFunction f, int order) {
