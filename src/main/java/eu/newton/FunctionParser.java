@@ -2,13 +2,12 @@ package eu.newton;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import eu.newton.magic.exceptions.LambdaCreationException;
+import eu.newton.magic.LambdaFactory;
 
-import javax.script.ScriptException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 import java.util.regex.Pattern;
 
 public class FunctionParser {
@@ -29,8 +28,9 @@ public class FunctionParser {
 
     private static final Pattern DOUBLE = Pattern.compile("(\\d+(\\.\\d+)?)");
 
-    public Function<BigDecimal, BigDecimal> parse(String function) throws ScriptException {
+    private static final LambdaFactory factory = LambdaFactory.get();
 
+    public DoubleUnaryOperator parse(String function) throws LambdaCreationException {
         if (function.isEmpty()) {
             throw new IllegalArgumentException("You didn't insert a function");
         }
@@ -47,14 +47,9 @@ public class FunctionParser {
 
         function = parseGroups(groups);
 
-        final String parserVar = "var parser = Packages.eu.newton.FunctionParser;";
-
-        @SuppressWarnings("unchecked")
-        Function<BigDecimal,BigDecimal>  f = (Function<BigDecimal, BigDecimal>)
-                Nashorn.getInstance().eval(parserVar + " new java.util.function.Function(function(x) " + function + ")");
+        DoubleUnaryOperator f = factory.createLambda("(x) -> " + function);
 
         return f;
-
     }
 
     private List<String> getGroups(String group) {
@@ -89,10 +84,10 @@ public class FunctionParser {
             return 1;
         }
 
-        if (Character.isDigit(c)) {
+        if (c >= '0' && c <= '9') {
             for (int i = 1; i < group.length(); i++) {
                 char d = group.charAt(i);
-                if (!Character.isDigit(d) && d != '.') {
+                if (!(d >= '0' && d <= '9') && d != '.') {
                     return i;
                 }
             }
@@ -133,19 +128,11 @@ public class FunctionParser {
     }
 
     private String parseGroup(String group) {
-        if (isNumber(group)) {
-            return "(java.math.BigDecimal.valueOf(" + group + "))";
+        if (group.length() == 1) {
+            return group;
         }
 
         char c = group.charAt(0);
-
-        if (group.length() == 1) {
-            if (c == 'x') {
-                return '(' + group + ')';
-            } else {
-                return group;
-            }
-        }
 
         if (c == '(' && group.charAt(group.length() - 1) == ')') {
             List<String> l = getGroups(group.substring(1, group.length() - 1));
@@ -153,7 +140,11 @@ public class FunctionParser {
         }
 
         if (c != 'x' && Character.isLetter(c)) {
-            return '(' + parseNestedGroups(group) + ')';
+            return parseNestedGroups(group);
+        }
+
+        if (DOUBLE.matcher(group).find()) {
+            return group;
         }
 
         throw new IllegalArgumentException("Unsupported group");
@@ -172,118 +163,142 @@ public class FunctionParser {
             if (c == '(') {
                 String f = replaceMathFunctions(group.substring(0, i));
                 logger.trace("MATHF: {}", f);
-                String parsed = f + "(parser.unwrap(" + parseGroups(getGroups(group.substring(i + 1, group.length() - 1))) + "))";
+                String parsed = f + "(" + parseGroups(getGroups(group.substring(i + 1, group.length() - 1))) + ")";
                 logger.trace("============BLOCK=============");
                 logger.trace("");
-                return "java.math.BigDecimal.valueOf(" + parsed + ')';
+                return parsed;
             }
         }
 
         throw new IllegalArgumentException("You're not supposed to be here");
-
     }
 
+    private int powCounter = 0;
     private String parseGroups(List<String> groups) {
         logger.trace("");
         logger.trace("PARSING: {}", groups);
 
-        StringBuilder function = new StringBuilder();
+        String function;
+
         if (groups.size() != 1) {
-            groups = fixThePow(groups);
-            ListIterator<String> it = groups.listIterator();
 
-            String current;
-            String op;
+            StringBuilder builder = new StringBuilder();
 
-            while (it.hasNext()) {
-                current = it.next();
+            String current = groups.get(0);
+            String op = groups.get(1);
 
-                if (current.startsWith("java.lang.Math.")) {
-                    current = "java.math.BigDecimal.valueOf(" + current + ')';
-                    it.set(current);
-                    logger.trace("NEW CURRENT: {}", current);
-                }
-
-                if (it.hasNext()) {
-                    op = it.next();
-
-                    logger.trace("CURRENT: {}", current);
-                    logger.trace("OP: {}", op);
-
-                    if (op.equals("*") || op.equals("/")) {
-                        String to = it.next();
-                        it.set('(' + current + replaceBigMethods(op) + to + ')');
-                        it.previous();
-                        it.previous();
-                        it.remove();
-                        it.previous();
-                        it.remove();
-                    }
-                }
-            }
-
-            logger.trace("DHL: {}", groups);
-
-
-            groups.forEach(s -> {
-                if (s.length() == 1) {
-                    function.append(replaceBigMethods(s));
-                } else {
-                    function.append('(').append(s).append(')');
-                }
-            });
-
-        } else {
-            function.append(groups.get(0));
-        }
-
-        String ffs = function.toString();
-
-        logger.trace("DONE: {}", ffs);
-        logger.trace("");
-
-        return ffs;
-    }
-
-    private List<String> fixThePow(List<String> list) {
-        ListIterator<String> it = list.listIterator(list.size() - 1);
-
-        it.next();
-        String current;
-        String op;
-
-
-        while (it.hasPrevious()) {
-            current = it.previous();
-
-            if (it.hasPrevious()) {
-                op = it.previous();
+            for (int i = 2; i < groups.size(); i++) {
 
                 logger.trace("CURRENT: {}", current);
                 logger.trace("OP: {}", op);
 
-
                 if (op.equals("^")) {
-                    String to = it.previous();
+                    String to = groups.get(i);
+                    logger.trace("TO: {}", to);
+                    if (i < groups.size() - 1 && groups.get(i + 1).equals("^")) {
+                        current = current + ',' + "java.lang.Math.pow(" + to;
+                        op = groups.get(i + 1);
+                        this.powCounter++;
+                        i++;
+                        continue;
+                    } else {
+                        current = "java.lang.Math.pow(" + current + ',' + to + ')';
+                        for (int j = 0; j < this.powCounter; j++) {
+                            current += ')';
+                        }
+                        if (i < groups.size() - 1) {
+                            op = groups.get(i + 1);
+                            i++;
+                            continue;
+                        } else {
+                            builder.append(current);
+                            break;
+                        }
 
-                    current = "parser.unwrap(" + current + ")";
-                    to = "parser.unwrap("  + to + ")";
+                    }
 
+                } else if (op.equals("*") || op.equals("/")) {
+                    String to = groups.get(i);
+                    current = '(' + current + op + to + ')';
+                    i++;
+                    if (i < groups.size()) {
+                        op = groups.get(i);
+                        continue;
+                    } else {
+                        builder.append(current);
+                        break;
+                    }
+                } else if (current.equals("x") || current.contains(".")) {
+                    if (op.equals("+")) {
+                        String to = groups.get(i);
+                        logger.trace("TO: {}", to);
+                        if (to.equals("x") || to.contains(".")) {
+                            if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
+                                builder.append(current).append(op);
+                            } else {
+                                current = "eu.newton.MathHelper.add(" + current + "," + to + ")";
+                                i++;
+                                if (i < groups.size()) {
+                                    op = groups.get(i);
+                                    continue;
+                                } else {
+                                    builder.append(current);
+                                    break;
+                                }
+                            }
+                        } else {
+                            builder.append(current).append(op);
+                        }
+                    } else if (op.equals("-")) {
+                        String to = groups.get(i);
+                        logger.trace("TO: {}", to);
+                        if (to.equals("x") || to.contains(".")) {
+                            if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
+                                builder.append(current).append(op);
+                            } else {
+                                current = "eu.newton.MathHelper.minus(" + current + "," + to + ")";
+                                i++;
+                                if (i < groups.size()) {
+                                    op = groups.get(i);
+                                    continue;
+                                } else {
+                                    builder.append(current);
+                                    break;
+                                }
+                            }
+                        } else {
+                            builder.append(current).append(op);
+                        }
+                    } else {
+                        builder.append(current).append(op);
+                    }
+                } else {
+                    builder.append(current).append(op);
+                }
 
-                    it.set("(parser.wrap(java.lang.Math.pow(" + to + ',' + current + ")))");
-                    it.next();
-                    it.next();
-                    it.remove();
-                    it.next();
-                    it.remove();
+                logger.trace("Builder: {} ", builder);
+
+                if (i < groups.size() - 2) {
+                    current = groups.get(i);
+                    op = groups.get(i + 1);
+                    i += 1;
+                } else {
+                    builder.append(groups.get(i));
+                    break;
                 }
             }
+
+            function = builder.toString();
+
+        } else {
+            function = groups.get(0);
         }
 
-        logger.trace("POW L: {}", list);
 
-        return list;
+        logger.trace("DONE: {}", function);
+        logger.trace("");
 
+        return function;
     }
 
     private String replaceMathFunctions(String input) {
@@ -305,48 +320,5 @@ public class FunctionParser {
         logger.trace("EndMath: {}", input);
 
         return input;
-    }
-
-    private String replaceBigMethods(String input) {
-        logger.trace("ReplaceBig: {}", input);
-
-        input = DOUBLE.matcher(input).replaceAll("(java.math.BigDecimal.valueOf($0))");
-
-        input = input.replace("x", "(x)");
-        input = input.replace("*", ".multiply");
-        input = input.replace("/", ".divide");
-        input = input.replace("-", ".subtract");
-        input = input.replace("+", ".add");
-
-        logger.trace("EndBig: {}", input);
-        logger.trace("");
-
-        return input;
-
-    }
-
-    private boolean isNumber(String s) {
-        try {
-            Double.parseDouble(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    public static BigDecimal wrap(double d) {
-        return BigDecimal.valueOf(d);
-    }
-
-    public static BigDecimal wrap(BigDecimal bd) {
-        return bd;
-    }
-
-    public static double unwrap(double d) {
-        return d;
-    }
-
-    public static double unwrap(BigDecimal bd) {
-        return bd.doubleValue();
     }
 }
