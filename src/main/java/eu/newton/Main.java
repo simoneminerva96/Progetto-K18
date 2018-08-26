@@ -3,9 +3,6 @@ package eu.newton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.script.ScriptException;
-import java.math.BigDecimal;
-
 
 public class Main {
 
@@ -13,43 +10,32 @@ public class Main {
 
     public static void main(String[] args) {
 
-        final String f = "(2^2^(x-2)^sin(x)^2+sqrt(3))^sin(3*x^2)";
+        final String f = "x*x+3^2-3^2+1";
 
         try {
             MathFunction function = new MathFunction(f);
 
-            BigDecimal result = null;
+            double result;
 
             try {
-                result = function.evaluate(k(2));
+                result = function.evaluate(0.2);
+                logger.debug("RESULT: {}", result);
             } catch (NumberFormatException | ArithmeticException ex) {
                 logger.error("Are you retarded ? ");
                 logger.error(ex.getMessage());
             } catch (Exception ex) {
                 logger.error("Stop it java");
                 logger.error(ex.getMessage());
+                ex.printStackTrace();
             }
 
-            logger.debug("RESULT: {}", result);
-
-        } catch (ScriptException e) {
+        } catch (Exception e) {
             logger.error("Good job, you won. Now fuck off ");
             logger.error(e.getMessage());
+            e.printStackTrace();
         }
 
     }
-
-
-    public static BigDecimal k(double d) {
-        return BigDecimal.valueOf(d);
-    }
-
-
-
-
-//    public static BigDecimal precise(BigDecimal a, BigDecimal b) {
-//        return a.divide(b, 1000, BigDecimal.ROUND_CEILING);
-//    }
 
 }
 
