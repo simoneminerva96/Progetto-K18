@@ -236,7 +236,7 @@ public class FunctionParser {
                             if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
                                 builder.append(current).append(op);
                             } else {
-                                current = "eu.newton.MathHelper.add(" + current + "," + to + ")";
+                                current = "eu.newton.util.MathHelper.add(" + current + "," + to + ")";
                                 i++;
                                 if (i < groups.size()) {
                                     op = groups.get(i);
@@ -256,7 +256,7 @@ public class FunctionParser {
                             if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
                                 builder.append(current).append(op);
                             } else {
-                                current = "eu.newton.MathHelper.minus(" + current + "," + to + ")";
+                                current = "eu.newton.util.MathHelper.minus(" + current + "," + to + ")";
                                 i++;
                                 if (i < groups.size()) {
                                     op = groups.get(i);
