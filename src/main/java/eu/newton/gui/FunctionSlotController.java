@@ -73,7 +73,7 @@ public class FunctionSlotController implements Initializable {
         } else {
             this.toggle.setGraphic(this.show);
             MathFunction f = box.getFunctions().get(last);
-            if (f == null) {
+            if (f == null && !last.isEmpty()) {
                 try {
                     f = new MathFunction(last);
                     box.getFunctions().put(last, f);
@@ -99,6 +99,10 @@ public class FunctionSlotController implements Initializable {
         box.getFunctions().remove(this.function.getPrevious());
         MathFunction f = box.getFunctions().get(input);
         if (f == null) {
+            if (input.isEmpty()) {
+                this.function.setPrevious("");
+                return;
+            }
             try {
                 f = new MathFunction(input);
                 box.getFunctions().put(input, f);
