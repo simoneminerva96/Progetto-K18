@@ -22,6 +22,10 @@ public class Sanitizer {
     public static String simplify(String function) {
         function = SPACE.matcher(function).replaceAll("");
 
+        if (function.isEmpty()) {
+            throw new IllegalArgumentException("You didn't insert a function");
+        }
+
         char first = function.charAt(0);
 
         if (first == '+') {
