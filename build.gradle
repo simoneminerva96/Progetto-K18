@@ -23,6 +23,8 @@ dependencies {
 
     compile 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
 
+    compile 'it.unimi.dsi:fastutil:8.2.1'
+
     compile 'de.jensd:fontawesomefx-commons:9.1.2-jpms'
     compile 'de.jensd:fontawesomefx-materialicons:2.2.0-9.1.2-jpms'
     compile 'de.jensd:fontawesomefx-fontawesome:4.7.0-9.1.2-jpms'

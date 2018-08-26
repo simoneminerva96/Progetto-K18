@@ -1,6 +1,7 @@
 package eu.newton.gui;
 
 import eu.newton.MathFunction;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -13,7 +14,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class CartesianPlane extends Pane {
@@ -30,7 +30,7 @@ public class CartesianPlane extends Pane {
     private final NumberAxis xAxis = new NumberAxis(MIN_X, MAX_X, AXIS_TICK);
     private final NumberAxis yAxis = new NumberAxis(MIN_Y, MAX_Y, AXIS_TICK);
 
-    private final ObservableMap<MathFunction, Map<Integer, Path>> functions = FXCollections.observableHashMap();
+    private final ObservableMap<MathFunction, Int2ObjectOpenHashMap<Path>> functions = FXCollections.observableHashMap();
 
 
     public CartesianPlane() {
@@ -42,7 +42,7 @@ public class CartesianPlane extends Pane {
         this.xAxis.setSide(Side.BOTTOM);
         this.yAxis.setSide(Side.RIGHT);
 
-        this.functions.addListener((MapChangeListener<MathFunction, Map<Integer, Path>>) change -> {
+        this.functions.addListener((MapChangeListener<MathFunction, Int2ObjectOpenHashMap<Path>>) change -> {
             if (change.wasRemoved()) {
                 getChildren().removeAll(change.getValueRemoved().values());
             }
@@ -54,7 +54,7 @@ public class CartesianPlane extends Pane {
 
     public void plot(MathFunction f) {
 
-        Path path = this.functions.computeIfAbsent(f, mathf -> new HashMap<>()).get(0);
+        Path path = this.functions.computeIfAbsent(f, mathf -> new Int2ObjectOpenHashMap<>()).get(0);
         if (path == null) {
             path = new Path();
             path.setStroke(Color.ORANGE.deriveColor(0, 1, 1, 0.6));
@@ -128,7 +128,7 @@ public class CartesianPlane extends Pane {
 
     }
 
-    public ObservableMap<MathFunction, Map<Integer, Path>> getFunctions() {
+    public ObservableMap<MathFunction, Int2ObjectOpenHashMap<Path>> getFunctions() {
         return this.functions;
     }
 }
