@@ -30,7 +30,7 @@ public class FunctionParser {
 
     private static final LambdaFactory factory = LambdaFactory.get();
 
-    public DoubleUnaryOperator parse(String function) throws LambdaCreationException {
+    public DoubleUnaryOperator parse(String function) throws LambdaCreationException, IllegalArgumentException {
         if (function.isEmpty()) {
             throw new IllegalArgumentException("You didn't insert a function");
         }
