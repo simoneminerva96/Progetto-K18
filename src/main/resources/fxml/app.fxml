@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXScrollPane?>
+<?import com.jfoenix.controls.JFXSnackbar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<?import javafx.scene.control.ScrollPane?>
+<?import eu.newton.gui.CartesianPlane?>
+<?import eu.newton.gui.FunctionVBox?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.newton.gui.PlotterController" stylesheets="@/css/plotter.css">
+   <CartesianPlane fx:id="plane"/>
+   <VBox fx:id="menu">
+      <HBox styleClass="optionsBar">
+         <HBox styleClass="leftOptionsBar">
+            <JFXButton fx:id="add" text="+" onMouseClicked="#onAdd"/>
+            <JFXButton fx:id="clear" text="Clear" onMouseClicked="#onClear"/>
+         </HBox>
+         <JFXButton fx:id="hide" text="&lt;&lt;" onMouseClicked="#onHide"/>
+      </HBox>
+      <ScrollPane fx:id="scroll">
+         <FunctionVBox fx:id="slots">
+            <fx:include source="slot.fxml"/>
+         </FunctionVBox>
+      </ScrollPane>
+   </VBox>
+   <JFXButton fx:id="show" text="&gt;&gt;" onMouseClicked="#onShow"/>
+   <!--<JFXSnackbar fx:id="popup"/>-->
+</StackPane>

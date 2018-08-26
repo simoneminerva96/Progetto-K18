@@ -1,0 +1,38 @@
+
+#prompt {
+    -fx-font-size: 16px;
+    -fx-font-style: oblique;
+}
+
+#function {
+    -fx-pref-width: 165px;
+    -fx-font-style: oblique;
+    -jfx-focus-color: green;
+}
+
+#delete {
+    -fx-background-color: #bc0000;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.slot {
+    -fx-pref-height: 50px;
+    -fx-alignment: center;
+    -fx-padding: 0px 2px 0px 8px;
+    -fx-spacing: 8px;
+    -fx-border-style: solid;
+    -fx-border-color: gray;
+    -fx-border-width: 0px 0px 1px 0px;
+    -fx-background-color: white;
+}
+
+.ter {
+    -fx-alignment: center;
+    -fx-background-color: green;
+    -fx-border-color: white;
+    -fx-border-radius: 9;
+    -fx-border-width: 10px 0px 10px 0px;
+    -fx-background-radius: 20;
+    -fx-font-size: 16px;
+}

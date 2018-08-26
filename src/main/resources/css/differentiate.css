@@ -1,0 +1,20 @@
+
+.modifier {
+    -fx-alignment: center;
+    -fx-border-color: darkgreen;
+    -fx-border-style: solid;
+    -fx-border-width: 0px, 0px, 0px, 1px;
+}
+
+#order {
+    -fx-font-weight: bold;
+}
+
+.box {
+    -fx-alignment: center;
+    -fx-background-color: green;
+    -fx-border-color: white;
+    -fx-border-radius: 9;
+    -fx-border-width: 10px 0px 10px 0px;
+    -fx-background-radius: 20;
+}
