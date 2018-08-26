@@ -1,4 +1,4 @@
-package eu.newton;
+package eu.newton.parser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

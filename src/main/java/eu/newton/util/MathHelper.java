@@ -1,4 +1,4 @@
-package eu.newton;
+package eu.newton.util;
 
 public final class MathHelper {
 

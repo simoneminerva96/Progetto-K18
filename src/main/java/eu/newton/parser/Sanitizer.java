@@ -1,4 +1,4 @@
-package eu.newton;
+package eu.newton.parser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

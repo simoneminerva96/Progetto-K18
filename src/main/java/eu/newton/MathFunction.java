@@ -2,6 +2,7 @@ package eu.newton;
 
 import eu.newton.api.IDoubleDifferentiable;
 import eu.newton.magic.exceptions.LambdaCreationException;
+import eu.newton.parser.FunctionParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
