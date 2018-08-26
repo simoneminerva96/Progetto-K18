@@ -97,12 +97,12 @@ public class FunctionSlotController implements Initializable {
         }
         FunctionVBox box = ((FunctionVBox) this.derivative.getParent().getParent().getParent());
         box.getFunctions().remove(this.function.getPrevious());
+        if (input.isEmpty()) {
+            this.function.setPrevious("");
+            return;
+        }
         MathFunction f = box.getFunctions().get(input);
         if (f == null) {
-            if (input.isEmpty()) {
-                this.function.setPrevious("");
-                return;
-            }
             try {
                 f = new MathFunction(input);
                 box.getFunctions().put(input, f);
