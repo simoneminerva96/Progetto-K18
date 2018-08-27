@@ -69,20 +69,21 @@ public class CartesianPlane extends Pane {
             Rectangle r = new Rectangle(0, 0, getWidth(), getHeight());
             path.setClip(r);
 
-            double x = this.xAxis.getLowerBound();
-            double y = f.evaluate(x);
+            double x = this.xAxis.getLowerBound() * 100;
+            double y = f.evaluate(x / 100);
 
             path.getElements().add(new MoveTo(mapX(x), mapY(y)));
 
 
-            x += X_INC;
-            while (x <= this.xAxis.getUpperBound() * 2) {
-                y = f.evaluate(x);
+            double top = this.xAxis.getUpperBound() * 100;
 
-                path.getElements().add(new LineTo(mapX(x), mapY(y)));
+            while (x <= top) {
+                double value = x / 100;
+                y = f.evaluate(value);
 
+                path.getElements().add(new LineTo(mapX(value), mapY(y)));
 
-                x += X_INC;
+                x += X_INC * 100;
             }
             this.functions.get(f).put(0, path);
             getChildren().add(path);
