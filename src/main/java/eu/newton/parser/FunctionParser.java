@@ -27,6 +27,9 @@ public class FunctionParser {
     private static final Pattern SQRT = Pattern.compile("\\bsqrt\\b");
 
     private static final Pattern DOUBLE = Pattern.compile("(\\d+(\\.\\d+)?)");
+    private static final Pattern PI = Pattern.compile("\\bπ\\b");
+    private static final Pattern E = Pattern.compile("\\be\\b");
+
 
     private static final LambdaFactory factory = LambdaFactory.get();
 
@@ -42,6 +45,12 @@ public class FunctionParser {
         logger.trace("THE LIST: {}", groups);
 
         function = parseGroups(groups);
+
+        function = PI.matcher(function).replaceAll("java.lang.Math.PI");
+        function = E.matcher(function).replaceAll("java.lang.Math.E");
+
+        logger.trace("FINAL: {}", function);
+        logger.trace("");
 
         DoubleUnaryOperator f = factory.createLambda("(x) -> " + function);
 
@@ -76,7 +85,7 @@ public class FunctionParser {
 
         char c = group.charAt(0);
 
-        if (c == '*' || c == '/' || c == '+' || c == '-' || c == '^' || c == 'x') {
+        if (c == '*' || c == '/' || c == '+' || c == '-' || c == '^' || c == 'x' || c == 'e' || c == 'π') {
             return 1;
         }
 
@@ -289,7 +298,6 @@ public class FunctionParser {
         } else {
             function = groups.get(0);
         }
-
 
         logger.trace("DONE: {}", function);
         logger.trace("");

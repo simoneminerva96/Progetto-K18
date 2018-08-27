@@ -53,6 +53,8 @@ public class Sanitizer {
 
         function = BEGINNING_ENCLOSED_CONSTANT.matcher(function).replaceAll("$1");
 
+        function = function.replace("pi", "π");
+
         return function;
     }
 }

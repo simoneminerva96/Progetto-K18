@@ -10,7 +10,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        final String f = "x*x+3^2-3^2+1";
+        final String f = "sin(pi)+ln(e)";
 
         try {
             MathFunction function = new MathFunction(f);
