@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -38,6 +39,31 @@ public class PlotterController implements Initializable {
                 this.plane.plot(change.getValueAdded());
             } else if (change.wasRemoved()) {
                 this.plane.getFunctions().remove(change.getValueRemoved());
+            }
+        });
+
+        this.plane.setFocusTraversable(true);
+
+        this.plane.setOnMouseClicked(event -> PlotterController.this.plane.requestFocus());
+
+        this.plane.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.RIGHT) {
+                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() + 1);
+                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() + 1);
+            } else if (event.getCode() == KeyCode.LEFT) {
+                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() - 1);
+                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() - 1);
+            } else if (event.getCode() == KeyCode.UP) {
+                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() + 1);
+                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() + 1);
+            } else if (event.getCode() == KeyCode.DOWN) {
+                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() - 1);
+                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() - 1);
+            }
+
+            for (MathFunction f : this.slots.getFunctions().values()) {
+                this.plane.getFunctions().remove(f);
+                this.plane.plot(f);
             }
         });
     }

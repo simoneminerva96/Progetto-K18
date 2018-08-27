@@ -69,13 +69,14 @@ public class CartesianPlane extends Pane {
             Rectangle r = new Rectangle(0, 0, getWidth(), getHeight());
             path.setClip(r);
 
-            double x = MIN_X;
+            double x = this.xAxis.getLowerBound();
             double y = f.evaluate(x);
 
             path.getElements().add(new MoveTo(mapX(x), mapY(y)));
 
+
             x += X_INC;
-            while (x <= MAX_X * 2) {
+            while (x <= this.xAxis.getUpperBound() * 2) {
                 y = f.evaluate(x);
 
                 path.getElements().add(new LineTo(mapX(x), mapY(y)));
@@ -97,13 +98,13 @@ public class CartesianPlane extends Pane {
         Rectangle r = new Rectangle(0, 0, getWidth(), getHeight());
         path.setClip(r);
 
-        double x = MIN_X;
+        double x = this.xAxis.getLowerBound();
         double y = f.evaluate(x);
 
         path.getElements().add(new MoveTo(mapX(x), mapY(y)));
 
         x += X_INC;
-        while (x <= MAX_X * 2) {
+        while (x <= this.xAxis.getUpperBound() * 2) {
             y = f.evaluate(x);
 
             path.getElements().add(new LineTo(mapX(x), mapY(y)));
@@ -116,25 +117,22 @@ public class CartesianPlane extends Pane {
     }
 
     private double mapX(double x) {
-        double xwidth = this.xAxis.getUpperBound() - this.xAxis.getLowerBound();
-        double xi = ((xwidth / 2) + x);
-
-        double plotted =  (xi * getWidth()) / xwidth;
-
-        return plotted;
+        return  (x - this.xAxis.getLowerBound()) * getWidth() / (MAX_X - MIN_X);
     }
 
     private double mapY(double y) {
-        double ywidth = this.yAxis.getUpperBound() - this.yAxis.getLowerBound();
-        double yi = ((ywidth / 2) - y);
-
-        double plotted = (yi * getHeight()) / ywidth;
-
-        return plotted;
-
+        return  (this.yAxis.getUpperBound() - y) * getHeight() / (MAX_Y - MIN_Y);
     }
 
     public ObservableMap<MathFunction, Int2ObjectOpenHashMap<Path>> getFunctions() {
         return this.functions;
+    }
+
+    public NumberAxis getxAxis() {
+        return this.xAxis;
+    }
+
+    public NumberAxis getyAxis() {
+        return this.yAxis;
     }
 }
