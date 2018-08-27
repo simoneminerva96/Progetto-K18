@@ -59,6 +59,16 @@ public class PlotterController implements Initializable {
             } else if (event.getCode() == KeyCode.DOWN) {
                 this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() - 1);
                 this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() - 1);
+            } else if (event.getCode() == KeyCode.PLUS) {
+                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() + 0.1);
+                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() - 0.1);
+                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() + 0.1);
+                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() - 0.1);
+            } else if (event.getCode() == KeyCode.MINUS) {
+                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() - 0.1);
+                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() + 0.1);
+                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() - 0.1);
+                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() + 0.1);
             }
 
             for (MathFunction f : this.slots.getFunctions().values()) {

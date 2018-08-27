@@ -117,11 +117,11 @@ public class CartesianPlane extends Pane {
     }
 
     private double mapX(double x) {
-        return  (x - this.xAxis.getLowerBound()) * getWidth() / (MAX_X - MIN_X);
+        return  (x - this.xAxis.getLowerBound()) * getWidth() / (this.xAxis.getUpperBound() - this.xAxis.getLowerBound());
     }
 
     private double mapY(double y) {
-        return  (this.yAxis.getUpperBound() - y) * getHeight() / (MAX_Y - MIN_Y);
+        return  (this.yAxis.getUpperBound() - y) * getHeight() / (this.yAxis.getUpperBound() - this.yAxis.getLowerBound());
     }
 
     public ObservableMap<MathFunction, Int2ObjectOpenHashMap<Path>> getFunctions() {
