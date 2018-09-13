@@ -12,7 +12,7 @@ public class NewtonUI extends Application {
 
     public void start(Stage primaryStage) throws IOException {
 
-        StackPane root = FXMLLoader.load(getClass().getResource("/fxml/app.fxml"));
+        StackPane root = FXMLLoader.load(getClass().getResource("/fxml/MainView.fxml"));
         Scene scene = new Scene(root, 1280, 720);
 
         primaryStage.setTitle("Plotter");

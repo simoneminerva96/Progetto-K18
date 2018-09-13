@@ -1,5 +1,7 @@
 package eu.newton.parser;
 
+import eu.newton.data.INewtonFunction;
+import eu.newton.data.MathFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import eu.newton.magic.exceptions.LambdaCreationException;
@@ -33,8 +35,9 @@ public class FunctionParser {
 
     private static final LambdaFactory factory = LambdaFactory.get();
 
-    public DoubleUnaryOperator parse(String function) throws LambdaCreationException, IllegalArgumentException {
-        logger.trace("ORIGINAL: {}", function);
+    public INewtonFunction parse(String function) throws LambdaCreationException, IllegalArgumentException {
+        final String original = function;
+        logger.trace("ORIGINAL: {}", original);
 
         function = Sanitizer.simplify(function);
 
@@ -54,7 +57,7 @@ public class FunctionParser {
 
         DoubleUnaryOperator f = factory.createLambda("(x) -> " + function);
 
-        return f;
+        return new MathFunction(f, original);
     }
 
     private List<String> getGroups(String group) {
@@ -261,7 +264,7 @@ public class FunctionParser {
                             if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
                                 builder.append(current).append(op);
                             } else {
-                                current = "eu.newton.util.MathHelper.minus(" + current + "," + to + ")";
+                                current = "eu.newton.util.MathHelper.add(" + current + ",-" + to + ")";
                                 i++;
                                 if (i < groups.size()) {
                                     op = groups.get(i);

@@ -19,7 +19,7 @@
     -fx-translate-y: 10;
 }
 
-.leftOptionsBar {
+.leftOptions {
     -fx-spacing: 15;
     -fx-alignment: center-left;
     -fx-padding: 10;

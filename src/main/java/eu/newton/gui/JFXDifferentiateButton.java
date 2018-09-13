@@ -27,7 +27,7 @@ public class JFXDifferentiateButton extends JFXButton {
     }
 
     public void decrement() {
-        if (this.i.get() > 1) {
+        if (this.i.get() > 0) {
             this.i.set(this.i.get() - 1);
         }
     }

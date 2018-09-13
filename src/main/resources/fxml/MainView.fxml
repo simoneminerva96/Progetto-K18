@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import eu.newton.gui.plotter.CartesianPlane?>
+<?import com.jfoenix.controls.JFXButton?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="eu.newton.gui.MainController"
+           stylesheets="@/css/plotter.css"
+           prefHeight="400.0" prefWidth="600.0">
+    <CartesianPlane fx:id="plane" />
+    <VBox fx:id="menu">
+        <HBox styleClass="optionsBar">
+            <HBox styleClass="leftOptions">
+                <JFXButton fx:id="add" text="+" onMouseClicked="#onAdd"/>
+                <JFXButton fx:id="clear" text="Clear" onMouseClicked="#onClear"/>
+            </HBox>
+            <JFXButton fx:id="hide" text="&lt;&lt;" onMouseClicked="#onHide"/>
+        </HBox>
+        <ScrollPane fx:id="scroll">
+            <VBox fx:id="slots"/>
+        </ScrollPane>
+    </VBox>
+    <JFXButton fx:id="show" text="&gt;&gt;" onMouseClicked="#onShow"/>
+</StackPane>

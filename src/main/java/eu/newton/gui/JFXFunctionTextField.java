@@ -6,7 +6,6 @@ public class JFXFunctionTextField extends JFXTextField {
 
     private String previous;
 
-
     public String getPrevious() {
         return this.previous;
     }

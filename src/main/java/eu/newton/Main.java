@@ -1,5 +1,8 @@
 package eu.newton;
 
+import eu.newton.data.INewtonFunction;
+import eu.newton.data.MathFunction;
+import eu.newton.parser.FunctionFlyWeightFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +16,7 @@ public class Main {
         final String f = "sin(pi)+ln(e)";
 
         try {
-            MathFunction function = new MathFunction(f);
+            INewtonFunction function = FunctionFlyWeightFactory.getFunction(f);
 
             double result;
 

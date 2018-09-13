@@ -12,7 +12,7 @@
     -fx-background-color: #a4a4a4;
 }
 
-.leftOptionsBar {
+.leftOptions {
     -fx-spacing: 15;
     -fx-alignment: center-left;
     -fx-padding: 10;

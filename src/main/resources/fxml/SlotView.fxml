@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import eu.newton.gui.JFXDifferentiateButton?>
+<?import eu.newton.gui.JFXFunctionTextField?>
+
+<fx:root type="javafx.scene.layout.HBox"
+         xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml"
+         prefHeight="400.0" prefWidth="600.0"
+         stylesheets="@/css/slot.css" styleClass="slot">
+    <Label text="f(x) = "/>
+    <JFXFunctionTextField fx:id="input"/>
+    <HBox stylesheets="@/css/differentiate.css" styleClass="box">
+        <JFXDifferentiateButton text="Dⁿ" fx:id="derivative" onMouseClicked="#onDifferentiate" styleClass="compute"/>
+        <Label fx:id="order" text="1"/>
+        <VBox>
+            <JFXButton text="▴" onMouseClicked="#onIncrement" styleClass="modifier"/>
+            <JFXButton text="▾" onMouseClicked="#onDecrement" styleClass="modifier"/>
+        </VBox>
+    </HBox>
+    <VBox spacing="5" styleClass="ter">
+        <JFXButton fx:id="toggle" onMouseClicked="#onToggleVisible"/>
+        <JFXButton fx:id="refresh" onMouseClicked="#onRefresh"/>
+    </VBox>
+    <JFXButton fx:id="delete" onMouseClicked="#onRemove"/>
+</fx:root>

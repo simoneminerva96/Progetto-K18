@@ -1,24 +1,20 @@
-package eu.newton;
+package eu.newton.data;
 
-import eu.newton.api.IDoubleDifferentiable;
-import eu.newton.api.IDoubleExtrema;
-import eu.newton.api.IDoubleZero;
-import eu.newton.magic.exceptions.LambdaCreationException;
-import eu.newton.parser.FunctionParser;
+import eu.newton.util.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.function.DoubleUnaryOperator;
 
-public final class MathFunction implements IDoubleDifferentiable, IDoubleExtrema, IDoubleZero {
+public final class MathFunction implements INewtonFunction {
 
     private static final Logger logger = LogManager.getLogger(MathFunction.class);
     
     private final String function;
     private final DoubleUnaryOperator f;
 
-    public MathFunction(String function) throws LambdaCreationException, IllegalArgumentException {
-        this.f = new FunctionParser().parse(function);
+    public MathFunction(DoubleUnaryOperator f, String function) {
+        this.f = f;
         this.function = function;
     }
 
@@ -29,8 +25,24 @@ public final class MathFunction implements IDoubleDifferentiable, IDoubleExtrema
 
     @Override
     public double differentiate(double x, int grade) {
-        //TODO Find a consistent way
-        return 0;
+        double x1 = MathHelper.add(x,-0.0001);
+        double x2 = MathHelper.add(x,0.0001);
+
+        double y1 = evaluate(x1);
+        double y2 = evaluate(x2);
+
+        double m = MathHelper.add(y2, -y1) / MathHelper.add(x2, -x1);
+
+        while (grade > 1) {
+            y1 = differentiate(MathHelper.add(m,-0.0001), 0);
+            y2 = differentiate(MathHelper.add(m,0.0001), 0);
+
+            m = MathHelper.add(y2, -y1) / MathHelper.add(x2, -x1);
+
+            grade--;
+        }
+
+        return m;
     }
 
     @Override
@@ -107,5 +119,15 @@ public final class MathFunction implements IDoubleDifferentiable, IDoubleExtrema
 
         return Double.NaN;
 
+    }
+
+    @Override
+    public int hashCode() {
+        return this.function.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof INewtonFunction && this.function.equals(obj.toString());
     }
 }
