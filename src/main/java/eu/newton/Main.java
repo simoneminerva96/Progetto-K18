@@ -24,7 +24,7 @@ public class Main {
                 result = function.evaluate(0.2);
                 logger.debug("RESULT: {}", result);
             } catch (NumberFormatException | ArithmeticException ex) {
-                logger.error("Are you retarded ? ");
+                logger.error(":(");
                 logger.error(ex.getMessage());
             } catch (Exception ex) {
                 logger.error("Stop it java");
@@ -33,7 +33,7 @@ public class Main {
             }
 
         } catch (Exception e) {
-            logger.error("Good job, you won. Now fuck off ");
+            logger.error(":(((");
             logger.error(e.getMessage());
             e.printStackTrace();
         }
