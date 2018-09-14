@@ -12,8 +12,6 @@ import javafx.scene.shape.Rectangle;
 
 public class CartesianPlane extends Pane {
 
-    private final static double X_INC = 0.01;
-
     private final Color color = Color.ORANGE.deriveColor(0, 1, 1, 0.6);
 
     private final NumberAxis xAxis = new NumberAxis(-8, 8, 1);
@@ -45,6 +43,7 @@ public class CartesianPlane extends Pane {
         path.getElements().add(new MoveTo(mapX(x), mapY(y)));
 
         double top = this.xAxis.getUpperBound() * 100;
+        double step = (this.xAxis.getUpperBound() - this.xAxis.getLowerBound()) / 16;
 
         while (x <= top) {
             double value = x / 100;
@@ -52,7 +51,7 @@ public class CartesianPlane extends Pane {
 
             path.getElements().add(new LineTo(mapX(value), mapY(y)));
 
-            x += X_INC * 100;
+            x += step;
         }
         getChildren().add(path);
         return path;
