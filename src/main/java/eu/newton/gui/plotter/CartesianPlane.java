@@ -17,7 +17,7 @@ public class CartesianPlane extends Pane {
     private final Color color = Color.ORANGE.deriveColor(0, 1, 1, 0.6);
 
     private final NumberAxis xAxis = new NumberAxis(-8, 8, 1);
-    private final NumberAxis yAxis = new NumberAxis(-6, 6, 1);
+    private final NumberAxis yAxis = new NumberAxis(-8, 8, 1);
 
     public CartesianPlane() {
         this.xAxis.layoutYProperty().bind(heightProperty().divide(2));
@@ -72,6 +72,7 @@ public class CartesianPlane extends Pane {
         path.getElements().add(new MoveTo(mapX(x), mapY(y)));
 
         double top = this.xAxis.getUpperBound() * 100;
+        double step = (this.xAxis.getUpperBound() - this.xAxis.getLowerBound()) / 16;
 
         while (x <= top) {
             double value = x / 100;
@@ -79,18 +80,19 @@ public class CartesianPlane extends Pane {
 
             path.getElements().add(new LineTo(mapX(value), mapY(y)));
 
-            x += X_INC * 100;
+            x += step;
         }
+
         getChildren().add(path);
         return path;
     }
 
     private double mapX(double x) {
-        return  (x - this.xAxis.getLowerBound()) * getWidth() / (this.xAxis.getUpperBound() - this.xAxis.getLowerBound());
+        return (x - this.xAxis.getLowerBound()) * getWidth() / (this.xAxis.getUpperBound() - this.xAxis.getLowerBound());
     }
 
     private double mapY(double y) {
-        return  (this.yAxis.getUpperBound() - y) * getHeight() / (this.yAxis.getUpperBound() - this.yAxis.getLowerBound());
+        return (this.yAxis.getUpperBound() - y) * getHeight() / (this.yAxis.getUpperBound() - this.yAxis.getLowerBound());
     }
 
     public NumberAxis getxAxis() {

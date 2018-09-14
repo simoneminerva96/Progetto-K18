@@ -1,22 +1,26 @@
 package eu.newton.gui.plotter;
 
 import eu.newton.data.INewtonFunction;
+import eu.newton.util.MathHelper;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Path;
 
+import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.DoubleConsumer;
 
 public class ProxyPlotter {
 
     private final Map<INewtonFunction, Int2ObjectOpenHashMap<Path>> functions = new Object2ObjectOpenHashMap<>();
-
+    private final EnumMap<KeyCode, DoubleConsumer> commands = new EnumMap<>(KeyCode.class);
     private final CartesianPlane plane;
 
     public ProxyPlotter(CartesianPlane plane) {
         this.plane = plane;
+        initCommands();
         setupDragAndZoom();
     }
 
@@ -26,37 +30,61 @@ public class ProxyPlotter {
         this.plane.setOnMouseClicked(event -> this.plane.requestFocus());
 
         this.plane.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.RIGHT) {
-                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() + 1);
-                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() + 1);
+            DoubleConsumer command = this.commands.get(event.getCode());
+
+            if (command != null) {
+                double step = getStep();
+                command.accept(step);
                 repaint();
-            } else if (event.getCode() == KeyCode.LEFT) {
-                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() - 1);
-                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() - 1);
-                repaint();
-            } else if (event.getCode() == KeyCode.UP) {
-                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() + 1);
-                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() + 1);
-                repaint();
-            } else if (event.getCode() == KeyCode.DOWN) {
-                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() - 1);
-                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() - 1);
-                repaint();
-            } else if (event.getCode() == KeyCode.PLUS) {
-                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() + 0.1);
-                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() - 0.1);
-                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() + 0.1);
-                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() - 0.1);
-                repaint();
-            } else if (event.getCode() == KeyCode.MINUS) {
-                this.plane.getyAxis().setLowerBound(this.plane.getyAxis().getLowerBound() - 0.1);
-                this.plane.getyAxis().setUpperBound(this.plane.getyAxis().getUpperBound() + 0.1);
-                this.plane.getxAxis().setLowerBound(this.plane.getxAxis().getLowerBound() - 0.1);
-                this.plane.getxAxis().setUpperBound(this.plane.getxAxis().getUpperBound() + 0.1);
-                repaint();
+                this.plane.requestFocus();
             }
         });
     }
+
+    private void initCommands() {
+        this.commands.put(KeyCode.RIGHT, step -> {
+            this.plane.getxAxis().setLowerBound(MathHelper.add(this.plane.getxAxis().getLowerBound(), step));
+            this.plane.getxAxis().setUpperBound(MathHelper.add(this.plane.getxAxis().getUpperBound(), step));
+        });
+
+        this.commands.put(KeyCode.LEFT, step -> {
+            this.plane.getxAxis().setLowerBound(MathHelper.add(this.plane.getxAxis().getLowerBound(), -step));
+            this.plane.getxAxis().setUpperBound(MathHelper.add(this.plane.getxAxis().getUpperBound(), -step));
+        });
+
+        this.commands.put(KeyCode.UP, step -> {
+            this.plane.getyAxis().setUpperBound(MathHelper.add(this.plane.getyAxis().getUpperBound(), step));
+            this.plane.getyAxis().setLowerBound(MathHelper.add(this.plane.getyAxis().getLowerBound(), step));
+        });
+
+        this.commands.put(KeyCode.DOWN, step -> {
+            this.plane.getyAxis().setLowerBound(MathHelper.add(this.plane.getyAxis().getLowerBound(), -step));
+            this.plane.getyAxis().setUpperBound(MathHelper.add(this.plane.getyAxis().getUpperBound(), -step));
+        });
+
+        this.commands.put(KeyCode.PLUS, step -> {
+            double half = ((this.plane.getxAxis().getUpperBound() - this.plane.getxAxis().getLowerBound()) / 2);
+            if (half > 0.1) {
+                this.plane.getyAxis().setLowerBound(MathHelper.add(this.plane.getyAxis().getLowerBound(), step));
+                this.plane.getyAxis().setUpperBound(MathHelper.add(this.plane.getyAxis().getUpperBound(), -step));
+                this.plane.getxAxis().setLowerBound(MathHelper.add(this.plane.getxAxis().getLowerBound(), step));
+                this.plane.getxAxis().setUpperBound(MathHelper.add(this.plane.getxAxis().getUpperBound(), -step));
+            }
+        });
+
+        this.commands.put(KeyCode.MINUS, step -> {
+            this.plane.getyAxis().setLowerBound(MathHelper.add(this.plane.getyAxis().getLowerBound(), -step));
+            this.plane.getyAxis().setUpperBound(MathHelper.add(this.plane.getyAxis().getUpperBound(), step));
+            this.plane.getxAxis().setLowerBound(MathHelper.add(this.plane.getxAxis().getLowerBound(), -step));
+            this.plane.getxAxis().setUpperBound(MathHelper.add(this.plane.getxAxis().getUpperBound(), step));
+        });
+    }
+
+    private double getStep() {
+        double half = ((this.plane.getxAxis().getUpperBound() - this.plane.getxAxis().getLowerBound()) / 2);
+        return half < 10 ? 0.1 : 1;
+    }
+
 
     public void plot(INewtonFunction f, int order) {
         Int2ObjectOpenHashMap<Path> map = this.functions.get(f);
