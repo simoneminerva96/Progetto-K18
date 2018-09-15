@@ -1,6 +1,7 @@
 package eu.newton.data;
 
 import eu.newton.util.MathHelper;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,22 +103,26 @@ public final class MathFunction implements INewtonFunction {
     }
 
     @Override
-    public double getZero(double a, double b) {
+    public double[] getZeros(double a, double b) {
+        DoubleArrayList zeros = new DoubleArrayList();
+
         double x = a * 100;
         double y;
 
         double top = b * 100;
+        double step = (a - b) / 16;
 
         while (x <= top) {
             double value = x / 100;
             y = evaluate(value);
+
             if (y == 0) {
-                return value;
+                zeros.add(x);
             }
-            x += 1;
+            x += step;
         }
 
-        return Double.NaN;
+        return zeros.toDoubleArray();
 
     }
 
