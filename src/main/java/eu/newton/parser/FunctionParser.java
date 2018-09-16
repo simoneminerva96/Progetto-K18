@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 import java.util.regex.Pattern;
 
-public class FunctionParser {
+class FunctionParser {
 
-    private static final Logger logger = LogManager.getLogger(FunctionParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(FunctionParser.class);
 
     private static final Pattern LN = Pattern.compile("\\bln\\b");
+    private static final Pattern LOG = Pattern.compile("\\blog\\b");
     private static final Pattern SIN = Pattern.compile("\\bsin\\b");
     private static final Pattern COS = Pattern.compile("\\bcos\\b");
     private static final Pattern TAN = Pattern.compile("\\btan\\b");
@@ -29,31 +30,31 @@ public class FunctionParser {
     private static final Pattern SQRT = Pattern.compile("\\bsqrt\\b");
 
     private static final Pattern DOUBLE = Pattern.compile("(\\d+(\\.\\d+)?)");
+    private static final Pattern INT = Pattern.compile("(\\d+)/");
     private static final Pattern PI = Pattern.compile("\\bπ\\b");
     private static final Pattern E = Pattern.compile("\\be\\b");
 
-
     private static final LambdaFactory factory = LambdaFactory.get();
 
-    public INewtonFunction parse(String function) throws LambdaCreationException, IllegalArgumentException {
+    INewtonFunction parse(String function) throws LambdaCreationException, IllegalArgumentException {
         final String original = function;
-        logger.trace("ORIGINAL: {}", original);
+        LOGGER.trace("Original: {}", original);
 
         function = Sanitizer.simplify(function);
 
-        logger.trace("SIMPLIFIED: {}", function);
+        LOGGER.trace("Simplified: {}", function);
 
         List<String> groups = getGroups(function);
 
-        logger.trace("THE LIST: {}", groups);
+        LOGGER.trace("Groups: {}", groups);
 
         function = parseGroups(groups);
 
         function = PI.matcher(function).replaceAll("java.lang.Math.PI");
         function = E.matcher(function).replaceAll("java.lang.Math.E");
+        function = INT.matcher(function).replaceAll("$1*1.0/");
 
-        logger.trace("FINAL: {}", function);
-        logger.trace("");
+        LOGGER.trace("Function: {}", function);
 
         DoubleUnaryOperator f = factory.createLambda("(x) -> " + function);
 
@@ -64,18 +65,18 @@ public class FunctionParser {
         List<String> groups = new ArrayList<>();
         int index;
 
-        logger.trace("");
-        logger.trace("Parsing: {}", group);
+        LOGGER.trace("");
+        LOGGER.trace("Parsing: {}", group);
         do {
             index = getGroupIndex(group);
             String sub = group.substring(0, index);
-            logger.trace("INDEX: {}", index);
-            logger.trace("F: {}", sub);
+            LOGGER.trace("Index: {}", index);
+            LOGGER.trace("Group: {}", sub);
 
             String parsed = parseGroup(sub);
-            logger.trace("ADDING {}", parsed);
+            LOGGER.trace("Adding {}", parsed);
             groups.add(parsed);
-            logger.trace("");
+            LOGGER.trace("");
 
             group = group.substring(index);
         } while (!group.isEmpty());
@@ -84,7 +85,7 @@ public class FunctionParser {
     }
 
     private int getGroupIndex(String group) {
-        logger.trace("Index of: {}", group);
+        LOGGER.trace("Index of: {}", group);
 
         char c = group.charAt(0);
 
@@ -104,25 +105,15 @@ public class FunctionParser {
 
         int counter = -1;
 
-        char opening = 0;
-        char closing = 0;
-
         for (int i = 0; i < group.length(); i++) {
             c = group.charAt(i);
 
-            if (opening == 0) {
-                if (c == '(') {
-                    opening = '(';
-                    closing = ')';
-                }
-            }
-
-            if (c == opening) {
+            if (c == '(') {
                 if (counter == -1) {
                     counter = 0;
                 }
                 counter++;
-            } else if (c == closing) {
+            } else if (c == ')') {
                 counter--;
             }
 
@@ -160,8 +151,8 @@ public class FunctionParser {
     }
 
     private String parseNestedGroups(String group) {
-        logger.trace("");
-        logger.trace("============BLOCK=============");
+        LOGGER.trace("");
+        LOGGER.trace("============BLOCK=============");
 
         char c;
 
@@ -170,10 +161,10 @@ public class FunctionParser {
 
             if (c == '(') {
                 String f = replaceMathFunctions(group.substring(0, i));
-                logger.trace("MATHF: {}", f);
+                LOGGER.trace("Math Function: {}", f);
                 String parsed = f + "(" + parseGroups(getGroups(group.substring(i + 1, group.length() - 1))) + ")";
-                logger.trace("============BLOCK=============");
-                logger.trace("");
+                LOGGER.trace("============BLOCK=============");
+                LOGGER.trace("");
                 return parsed;
             }
         }
@@ -181,137 +172,99 @@ public class FunctionParser {
         throw new IllegalArgumentException("You're not supposed to be here");
     }
 
-    private int powCounter = 0;
     private String parseGroups(List<String> groups) {
-        logger.trace("");
-        logger.trace("PARSING: {}", groups);
+        LOGGER.trace("");
+        LOGGER.trace("Parsing: {}", groups);
 
-        String function;
+        if (groups.size() == 1) {
+            LOGGER.trace("DONE: {} ", groups.get(0));
+            LOGGER.trace("");
+            return groups.get(0);
+        }
 
-        if (groups.size() != 1) {
+        StringBuilder builder = new StringBuilder();
 
-            StringBuilder builder = new StringBuilder();
+        String current;
+        String op;
+        String to;
 
-            String current = groups.get(0);
-            String op = groups.get(1);
+        parsing:
+        for (int i = 0; i < groups.size() - 1;) {
+            current = groups.get(i);
+            LOGGER.trace("Argument 1: {} at {}", current, i);
 
-            for (int i = 2; i < groups.size(); i++) {
+            op = groups.get(++i);
+            LOGGER.trace("Operator: {} at {}", op, i);
 
-                logger.trace("CURRENT: {}", current);
-                logger.trace("OP: {}", op);
+            to = groups.get(++i);
+            LOGGER.trace("Argument 2: {} at {}", to, i);
 
-                if (op.equals("^")) {
-                    String to = groups.get(i);
-                    logger.trace("TO: {}", to);
-                    if (i < groups.size() - 1 && groups.get(i + 1).equals("^")) {
-                        current = current + ',' + "java.lang.Math.pow(" + to;
-                        op = groups.get(i + 1);
-                        this.powCounter++;
-                        i++;
-                        continue;
-                    } else {
-                        current = "java.lang.Math.pow(" + current + ',' + to + ')';
-                        for (int j = 0; j < this.powCounter; j++) {
-                            current += ')';
-                        }
-                        if (i < groups.size() - 1) {
-                            op = groups.get(i + 1);
-                            i++;
-                            continue;
-                        } else {
-                            builder.append(current);
-                            break;
-                        }
-
-                    }
-
-                } else if (op.equals("*") || op.equals("/")) {
-                    String to = groups.get(i);
-                    current = '(' + current + op + to + ')';
-                    i++;
-                    if (i < groups.size()) {
-                        op = groups.get(i);
-                        continue;
-                    } else {
-                        builder.append(current);
-                        break;
-                    }
-                } else if (current.equals("x") || current.contains(".")) {
-                    if (op.equals("+")) {
-                        String to = groups.get(i);
-                        logger.trace("TO: {}", to);
-                        if (to.equals("x") || to.contains(".")) {
-                            if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
-                                builder.append(current).append(op);
-                            } else {
-                                current = "eu.newton.util.MathHelper.add(" + current + "," + to + ")";
-                                i++;
-                                if (i < groups.size()) {
-                                    op = groups.get(i);
-                                    continue;
-                                } else {
-                                    builder.append(current);
-                                    break;
-                                }
-                            }
-                        } else {
-                            builder.append(current).append(op);
-                        }
-                    } else if (op.equals("-")) {
-                        String to = groups.get(i);
-                        logger.trace("TO: {}", to);
-                        if (to.equals("x") || to.contains(".")) {
-                            if (i < groups.size() - 1 && (groups.get(i + 1).equals("*") || groups.get(i + 1).equals("/") || groups.get(i + 1).equals("^"))) {
-                                builder.append(current).append(op);
-                            } else {
-                                current = "eu.newton.util.MathHelper.add(" + current + ",-" + to + ")";
-                                i++;
-                                if (i < groups.size()) {
-                                    op = groups.get(i);
-                                    continue;
-                                } else {
-                                    builder.append(current);
-                                    break;
-                                }
-                            }
-                        } else {
-                            builder.append(current).append(op);
-                        }
-                    } else {
-                        builder.append(current).append(op);
-                    }
-                } else {
-                    builder.append(current).append(op);
+            if (op.equals("^")) {
+                if (i == groups.size() - 1) {
+                    builder.append("java.lang.Math.pow(").append(current).append(",").append(to).append(")");
+                    break;
                 }
 
-                logger.trace("Builder: {} ", builder);
+                StringBuilder pow = new StringBuilder();
+                pow.append("eu.newton.util.MathHelper.pow(").append(current).append(",").append(to);
 
-                if (i < groups.size() - 2) {
-                    current = groups.get(i);
-                    op = groups.get(i + 1);
-                    i += 1;
-                } else {
-                    builder.append(groups.get(i));
-                    break;
+                while (i < groups.size()) {
+                    op = groups.get(++i);
+                    LOGGER.trace("Operator: {} at {}", op, i);
+
+                    if (!op.equals("^")) {
+                        i++;
+                        break;
+                    }
+
+                    pow.append(",").append(groups.get(++i));
+                    if (i == groups.size() - 1) {
+                        pow.append(")");
+                        builder.append(pow.toString());
+                        break parsing;
+                    }
+                }
+                pow.append(")");
+                current = pow.toString();
+
+            } else if ((current.equals("x") || current.contains(".")) && (op.equals("+") || op.equals("-")) && (to.equals("x") || to.contains("."))) {
+                if (i < 3 || groups.get(i - 3).equals("+")) {
+                    to = op.equals("+") ? to : "-" + to;
+                    if (i == groups.size() - 1) {
+                        builder.append("eu.newton.util.MathHelper.add(").append(current).append(",").append(to).append(")");
+                        break;
+                    }
+
+                    String nextOp = groups.get(i + 1);
+                    if (nextOp.equals("+") || nextOp.equals("-")) {
+                        current = "eu.newton.util.MathHelper.add(" + current + "," + to + ")";
+                    }
                 }
             }
 
-            function = builder.toString();
+            builder.append(current).append(op);
 
-        } else {
-            function = groups.get(0);
+            LOGGER.trace("Builder : {} ", builder);
+
+            if (i == groups.size() - 1) {
+                builder.append(to);
+                break;
+            }
         }
 
-        logger.trace("DONE: {}", function);
-        logger.trace("");
+        String function = builder.toString();
+
+        LOGGER.trace("Done: {}", function);
+        LOGGER.trace("");
 
         return function;
     }
 
     private String replaceMathFunctions(String input) {
-        logger.trace("");
-        logger.trace("ReplaceMath: {}", input);
+        LOGGER.trace("");
+        LOGGER.trace("Replacing Math Function: {}", input);
 
+        input = LOG.matcher(input).replaceAll("java.lang.Math.log10");
         input = LN.matcher(input).replaceAll("java.lang.Math.log");
         input = SIN.matcher(input).replaceAll("java.lang.Math.sin");
         input = COS.matcher(input).replaceAll("java.lang.Math.cos");
@@ -324,7 +277,7 @@ public class FunctionParser {
         input = TANH.matcher(input).replaceAll("java.lang.Math.tanh");
         input = SQRT.matcher(input).replaceAll("java.lang.Math.sqrt");
 
-        logger.trace("EndMath: {}", input);
+        LOGGER.trace("Replaced: {}", input);
 
         return input;
     }

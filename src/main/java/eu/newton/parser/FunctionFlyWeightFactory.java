@@ -8,13 +8,13 @@ import java.util.Map;
 
 public class FunctionFlyWeightFactory {
 
-    private static final Map<String, INewtonFunction> functions = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, INewtonFunction> FUNCTIONS = new Object2ObjectOpenHashMap<>();
 
     public static INewtonFunction getFunction(String input) throws LambdaCreationException, IllegalArgumentException {
-        INewtonFunction f = functions.get(input);
+        INewtonFunction f = FUNCTIONS.get(input);
         if (f == null) {
             f = new FunctionParser().parse(input);
-            functions.put(input, f);
+            FUNCTIONS.put(input, f);
         }
         return f;
     }

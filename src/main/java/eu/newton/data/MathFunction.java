@@ -8,8 +8,6 @@ import org.apache.logging.log4j.Logger;
 import java.util.function.DoubleUnaryOperator;
 
 public final class MathFunction implements INewtonFunction {
-
-    private static final Logger logger = LogManager.getLogger(MathFunction.class);
     
     private final String function;
     private final DoubleUnaryOperator f;
