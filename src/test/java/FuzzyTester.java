@@ -98,7 +98,7 @@ class FuzzyTester {
 
             insanity++;
 
-        } while (insanity < 1);
+        } while (insanity < 6);
 
         while (count > 0) {
             function.append(")");

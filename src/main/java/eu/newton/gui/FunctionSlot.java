@@ -1,6 +1,7 @@
 package eu.newton.gui;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import eu.newton.data.INewtonFunction;
@@ -22,11 +23,12 @@ public class FunctionSlot extends HBox {
     private final FontAwesomeIconView trash = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
 
     private final ProxyPlotter plotter;
-    private int n = 0;
     private INewtonFunction function;
+    private int forder = 0;
 
-    @FXML private JFXFunctionTextField input;
+    @FXML private JFXTextField input;
 
+    private int n = 0;
     @FXML private Label order;
 
     @FXML private JFXButton toggle;
@@ -56,36 +58,15 @@ public class FunctionSlot extends HBox {
     @FXML
     private void onIncrement() {
         this.n++;
+        this.order.setText(String.valueOf(this.n));
     }
 
     @FXML
     private void onDecrement() {
         if (this.n > 0) {
             this.n--;
+            this.order.setText(String.valueOf(this.n));
         }
-    }
-
-    @FXML
-    private void onDifferentiate() {
-        String input = this.input.getText();
-        if (this.toggle.getGraphic() == this.hide || input.equals(this.input.getPrevious())) {
-            return;
-        }
-        try {
-            INewtonFunction f = FunctionFlyWeightFactory.getFunction(input);
-            this.function = f;
-            this.plotter.plot(f, this.n);
-            this.input.setPrevious(input);
-        } catch (LambdaCreationException e) {
-            this.input.setPrevious("");
-            //TODO invalid function
-        } catch (IllegalArgumentException ex) {
-            this.input.setPrevious("");
-            //TODO invalid function
-        }
-
-        this.plotter.plot(this.function, this.n);
-
     }
 
     @FXML
@@ -95,10 +76,10 @@ public class FunctionSlot extends HBox {
         }
         if (this.toggle.getGraphic() == this.show) {
             this.toggle.setGraphic(this.hide);
-            this.plotter.remove(this.function, this.n);
+            this.plotter.remove(this.function);
         } else {
             this.toggle.setGraphic(this.show);
-            this.plotter.plot(this.function, this.n);
+            this.plotter.plot(this.function);
         }
     }
 
@@ -108,24 +89,35 @@ public class FunctionSlot extends HBox {
         if (this.toggle.getGraphic() == this.hide) {
             return;
         }
+
+        if (this.function != null) {
+            if (input.equals(this.function.toString()) && this.n == this.forder) {
+                return;
+            }
+            this.plotter.remove(this.function);
+        }
         try {
-            INewtonFunction f = FunctionFlyWeightFactory.getFunction(input);
+            INewtonFunction f;
+            if (this.n == 0) {
+                f = FunctionFlyWeightFactory.getFunction(input);
+            } else {
+                f = FunctionFlyWeightFactory.getDerivative(input, this.n);
+            }
             this.function = f;
-            this.plotter.plot(f, this.n);
-            this.input.setPrevious(input);
+            this.forder = this.n;
+            this.plotter.plot(f);
         } catch (LambdaCreationException e) {
-            this.input.setPrevious("");
             //TODO invalid function
         } catch (IllegalArgumentException ex) {
-            this.input.setPrevious("");
             //TODO invalid function
         }
     }
 
     @FXML
     private void onRemove() {
-        this.plotter.remove(this.function, this.n);
+        this.plotter.remove(this.function);
         this.input.setText("");
+        this.function = null;
     }
 
 

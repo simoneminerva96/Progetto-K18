@@ -32,34 +32,6 @@ public class CartesianPlane extends Pane {
 
     Path plot(INewtonFunction f) {
 
-        Path path = new Path();
-        path.setStroke(this.color);
-        path.setStrokeWidth(2);
-        path.setClip(new Rectangle(0, 0, getWidth(), getHeight()));
-
-        double x = this.xAxis.getLowerBound() * 100;
-        double y = f.evaluate(x / 100);
-
-        path.getElements().add(new MoveTo(mapX(x), mapY(y)));
-
-        double top = this.xAxis.getUpperBound() * 100;
-        double step = (this.xAxis.getUpperBound() - this.xAxis.getLowerBound()) / 16;
-
-        while (x <= top) {
-            double value = x / 100;
-            y = f.evaluate(value);
-
-            path.getElements().add(new LineTo(mapX(value), mapY(y)));
-
-            x += step;
-        }
-        getChildren().add(path);
-        return path;
-
-    }
-
-    Path plot(INewtonFunction f, int order) {
-
         Path path  = new Path();
         path.setStroke(this.color);
         path.setStrokeWidth(2);
@@ -75,7 +47,8 @@ public class CartesianPlane extends Pane {
 
         while (x <= top) {
             double value = x / 100;
-            y = f.differentiate(value, order);
+
+            y = f.evaluate(value);
 
             path.getElements().add(new LineTo(mapX(value), mapY(y)));
 

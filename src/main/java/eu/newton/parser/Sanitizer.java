@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 public class Sanitizer {
 
     private static final Pattern SPACE = Pattern.compile(" ");
+    private static final Pattern PLUS_MINUS = Pattern.compile("\\+-");
+    private static final Pattern MINUS_MINUS = Pattern.compile("--");
     private static final Pattern BRACE_PLUS = Pattern.compile("\\(\\+");
     private static final Pattern BRACE_MINUS = Pattern.compile("\\(-");
     private static final Pattern ENCLOSED_X = Pattern.compile("([+\\-*/^])\\(x\\)");
@@ -52,6 +54,9 @@ public class Sanitizer {
         }
 
         function = BEGINNING_ENCLOSED_CONSTANT.matcher(function).replaceAll("$1");
+
+        function = PLUS_MINUS.matcher(function).replaceAll("+0-");
+        function = MINUS_MINUS.matcher(function).replaceAll("+");
 
         function = function.replace("pi", "π");
 

@@ -2,8 +2,6 @@ package eu.newton.gui.plotter;
 
 import eu.newton.data.INewtonFunction;
 import eu.newton.util.MathHelper;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Path;
@@ -14,7 +12,7 @@ import java.util.function.DoubleConsumer;
 
 public class ProxyPlotter {
 
-    private final Map<INewtonFunction, Int2ObjectOpenHashMap<Path>> functions = new Object2ObjectOpenHashMap<>();
+    private final Map<INewtonFunction, Path> functions = new Object2ObjectOpenHashMap<>();
     private final EnumMap<KeyCode, DoubleConsumer> commands = new EnumMap<>(KeyCode.class);
     private final CartesianPlane plane;
 
@@ -86,55 +84,34 @@ public class ProxyPlotter {
     }
 
 
-    public void plot(INewtonFunction f, int order) {
-        Int2ObjectOpenHashMap<Path> map = this.functions.get(f);
-        Path path = null;
-        if (map == null) {
-            map = new Int2ObjectOpenHashMap<>();
-            this.functions.put(f, map);
-        } else {
-            path = map.get(order);
-        }
+    public void plot(INewtonFunction f) {
+        Path path = this.functions.get(f);
         if (path == null) {
-            if (order == 0) {
-                path = this.plane.plot(f);
-            } else {
-                path = this.plane.plot(f, order);
-            }
-            map.put(order, path);
+            path = this.plane.plot(f);
+            this.functions.put(f, path);
         }
     }
 
-    public void remove(INewtonFunction f, int order) {
-        Int2ObjectOpenHashMap<Path> map = this.functions.get(f);
-        if (map != null) {
-            Path old = map.remove(order);
-            this.plane.getChildren().remove(old);
+    public void remove(INewtonFunction f) {
+        Path path = this.functions.get(f);
+        if (path != null) {
+            this.plane.getChildren().remove(path);
+            this.functions.remove(f);
         }
     }
 
     public void clear() {
-        for (Map.Entry<INewtonFunction, Int2ObjectOpenHashMap<Path>> entry : this.functions.entrySet()) {
-            for (Int2ObjectMap.Entry<Path> fastEntry : entry.getValue().int2ObjectEntrySet()) {
-                this.plane.getChildren().remove(fastEntry.getValue());
-            }
+        for (Map.Entry<INewtonFunction, Path> entry : this.functions.entrySet()) {
+            this.plane.getChildren().remove(entry.getValue());
         }
         this.functions.clear();
     }
 
     public void repaint() {
-        for (Map.Entry<INewtonFunction, Int2ObjectOpenHashMap<Path>> entry : this.functions.entrySet()) {
-            for (Int2ObjectMap.Entry<Path> fastEntry : entry.getValue().int2ObjectEntrySet()) {
-                this.plane.getChildren().remove(fastEntry.getValue());
-                int order = fastEntry.getIntKey();
-                Path path;
-                if (order == 0) {
-                    path = this.plane.plot(entry.getKey());
-                } else {
-                    path = this.plane.plot(entry.getKey(), fastEntry.getIntKey());
-                }
-                entry.getValue().replace(order, path);
-            }
+        for (Map.Entry<INewtonFunction, Path> entry : this.functions.entrySet()) {
+            this.plane.getChildren().remove(entry.getValue());
+            Path path = this.plane.plot(entry.getKey());
+            this.functions.replace(entry.getKey(), path);
         }
     }
 

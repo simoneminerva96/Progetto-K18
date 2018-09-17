@@ -1,5 +1,7 @@
 package eu.newton.data;
 
+import eu.newton.magic.exceptions.LambdaCreationException;
+import eu.newton.parser.FunctionFlyWeightFactory;
 import eu.newton.util.MathHelper;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +13,8 @@ public final class MathFunction implements INewtonFunction {
     
     private final String function;
     private final DoubleUnaryOperator f;
+    private INewtonFunction derivative;
+    private int order;
 
     public MathFunction(DoubleUnaryOperator f, String function) {
         this.f = f;
@@ -24,24 +28,16 @@ public final class MathFunction implements INewtonFunction {
 
     @Override
     public double differentiate(double x, int grade) {
-        double x1 = MathHelper.add(x,-0.0001);
-        double x2 = MathHelper.add(x,0.0001);
-
-        double y1 = evaluate(x1);
-        double y2 = evaluate(x2);
-
-        double m = MathHelper.add(y2, -y1) / MathHelper.add(x2, -x1);
-
-        while (grade > 1) {
-            y1 = differentiate(MathHelper.add(m,-0.0001), 0);
-            y2 = differentiate(MathHelper.add(m,0.0001), 0);
-
-            m = MathHelper.add(y2, -y1) / MathHelper.add(x2, -x1);
-
-            grade--;
+        if (this.derivative == null || this.order != grade) {
+            try {
+                this.derivative = FunctionFlyWeightFactory.getDerivative(this.function, grade);
+                this.order = grade;
+            } catch (LambdaCreationException e) {
+                //TODO couldn't differentiate this function
+            }
         }
 
-        return m;
+        return this.derivative.evaluate(x);
     }
 
     @Override

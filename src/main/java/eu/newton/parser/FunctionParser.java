@@ -1,5 +1,6 @@
 package eu.newton.parser;
 
+import eu.newton.data.ConstantFunction;
 import eu.newton.data.INewtonFunction;
 import eu.newton.data.MathFunction;
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +58,10 @@ class FunctionParser {
         LOGGER.trace("Function: {}", function);
 
         DoubleUnaryOperator f = factory.createLambda("(x) -> " + function);
+
+        if (!original.contains("x")) {
+            return new ConstantFunction(f.applyAsDouble(0), original);
+        }
 
         return new MathFunction(f, original);
     }

@@ -4,18 +4,17 @@
 <?import javafx.scene.layout.*?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import eu.newton.gui.JFXDifferentiateButton?>
-<?import eu.newton.gui.JFXFunctionTextField?>
 
+<?import com.jfoenix.controls.JFXTextField?>
 <fx:root type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx"
          xmlns:fx="http://javafx.com/fxml"
          prefHeight="400.0" prefWidth="600.0"
          stylesheets="@/css/slot.css" styleClass="slot">
     <Label text="f(x) = "/>
-    <JFXFunctionTextField fx:id="input"/>
+    <JFXTextField fx:id="input"/>
     <HBox stylesheets="@/css/differentiate.css" styleClass="box">
-        <Label fx:id="order" text="1" />
+        <Label fx:id="order" text="0" />
         <VBox alignment="BASELINE_CENTER">
             <JFXButton text="▴" onMouseClicked="#onIncrement" styleClass="modifier"/>
             <JFXButton text="▾" onMouseClicked="#onDecrement" styleClass="modifier"/>

@@ -19,4 +19,13 @@ public class FunctionFlyWeightFactory {
         return f;
     }
 
+    public static INewtonFunction getDerivative(String input, int order) throws LambdaCreationException, IllegalArgumentException {
+        while (order-- > 0) {
+            input = new DerivativeParser().getDerivative(input);
+        }
+
+        return getFunction(input);
+    }
+
+
 }

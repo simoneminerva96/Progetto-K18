@@ -73,8 +73,8 @@ public final class LambdaFactory {
 
         try (MemoryFileManager stdFileManager = new MemoryFileManager(JAVA_COMPILER.getStandardFileManager(null, null, null))) {
 
-            JavaCompiler.CompilationTask compilationTask = JAVA_COMPILER.getTask(stdErrWriter,
-                    stdFileManager, diagnosticsCollector,
+            JavaCompiler.CompilationTask compilationTask = JAVA_COMPILER.getTask(null,
+                    stdFileManager, null,
                     Arrays.asList("-target", "1.8", "-source", "1.8"), null, Collections.singletonList(classSourceObject));
 
             boolean success;
@@ -86,8 +86,7 @@ public final class LambdaFactory {
 
             if (!success) {
                 throw new ClassCompilationException(
-                        new CompilationDetails(name, source,
-                                ((DiagnosticCollector<JavaFileObject>) diagnosticsCollector).getDiagnostics(), stdErrWriter.toString()));
+                        new CompilationDetails(name, source, ((DiagnosticCollector<JavaFileObject>) diagnosticsCollector).getDiagnostics(), stdErrWriter.toString()));
             }
 
             return stdFileManager.getClasses();

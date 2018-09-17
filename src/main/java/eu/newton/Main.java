@@ -1,6 +1,7 @@
 package eu.newton;
 
 import eu.newton.data.INewtonFunction;
+import eu.newton.parser.DerivativeParser;
 import eu.newton.parser.FunctionFlyWeightFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +21,7 @@ public class Main {
             double result;
 
             try {
-                result = function.evaluate(0.2);
+                result = function.evaluate(7.0);
                 LOGGER.debug("RESULT: {}", result);
             } catch (NumberFormatException | ArithmeticException ex) {
                 LOGGER.error(":(");
