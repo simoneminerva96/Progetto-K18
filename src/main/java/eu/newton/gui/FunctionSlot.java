@@ -27,8 +27,6 @@ public class FunctionSlot extends HBox {
 
     @FXML private JFXFunctionTextField input;
 
-    @FXML private JFXDifferentiateButton derivative;
-
     @FXML private Label order;
 
     @FXML private JFXButton toggle;
@@ -48,9 +46,6 @@ public class FunctionSlot extends HBox {
             throw new RuntimeException(exception);
         }
 
-        this.order.textProperty().bind(this.derivative.orderProperty().asString());
-        this.derivative.prefHeightProperty().bind(this.delete.heightProperty());
-
         this.toggle.setGraphic(this.show);
         this.refresh.setGraphic(this.update);
         this.delete.setGraphic(this.trash);
@@ -60,13 +55,11 @@ public class FunctionSlot extends HBox {
 
     @FXML
     private void onIncrement() {
-        this.derivative.increment();
         this.n++;
     }
 
     @FXML
     private void onDecrement() {
-        this.derivative.decrement();
         if (this.n > 0) {
             this.n--;
         }

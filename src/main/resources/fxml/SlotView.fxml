@@ -15,9 +15,8 @@
     <Label text="f(x) = "/>
     <JFXFunctionTextField fx:id="input"/>
     <HBox stylesheets="@/css/differentiate.css" styleClass="box">
-        <JFXDifferentiateButton text="Dⁿ" fx:id="derivative" onMouseClicked="#onDifferentiate" styleClass="compute"/>
-        <Label fx:id="order" text="1"/>
-        <VBox>
+        <Label fx:id="order" text="1" />
+        <VBox alignment="BASELINE_CENTER">
             <JFXButton text="▴" onMouseClicked="#onIncrement" styleClass="modifier"/>
             <JFXButton text="▾" onMouseClicked="#onDecrement" styleClass="modifier"/>
         </VBox>

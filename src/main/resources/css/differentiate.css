@@ -1,7 +1,7 @@
 
 .modifier {
     -fx-alignment: center;
-    -fx-border-color: darkgreen;
+    -fx-border-color: green;
     -fx-border-style: solid;
     -fx-border-width: 0px, 0px, 0px, 1px;
 }
@@ -15,6 +15,6 @@
     -fx-background-color: green;
     -fx-border-color: white;
     -fx-border-radius: 9;
-    -fx-border-width: 10px 0px 10px 0px;
-    -fx-background-radius: 20;
+    -fx-border-width: 10px 10px 10px 10px;
+    -fx-background-radius: 18;
 }

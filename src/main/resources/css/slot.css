@@ -31,8 +31,8 @@
     -fx-alignment: center;
     -fx-background-color: green;
     -fx-border-color: white;
-    -fx-border-radius: 9;
-    -fx-border-width: 10px 0px 10px 0px;
+    -fx-border-radius: 10;
+    -fx-border-width: 10px 10px 10px 10px;
     -fx-background-radius: 20;
     -fx-font-size: 16px;
 }
