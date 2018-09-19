@@ -18,17 +18,17 @@ public final class ConstantFunction implements INewtonFunction {
 
     @Override
     public double getMaximum(double a, double b) {
-        return 0;
+        return k;
     }
 
     @Override
     public double getMinimum(double a, double b) {
-        return 0;
+        return k;
     }
 
     @Override
     public double[] getZeros(double a, double b) {
-        return new double[]{0};
+        return null;
     }
 
     @Override
