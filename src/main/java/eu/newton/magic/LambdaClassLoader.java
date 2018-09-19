@@ -4,7 +4,7 @@ import eu.newton.magic.clazz.CompiledClassJavaObject;
 
 import java.util.Map;
 
-public class LambdaClassLoader extends ClassLoader {
+public class LambdaClassLoader extends ClassLoader implements AutoCloseable {
 
     private final Map<String, CompiledClassJavaObject> classes;
 
@@ -37,4 +37,8 @@ public class LambdaClassLoader extends ClassLoader {
         }
     }
 
+    @Override
+    public void close() {
+        this.classes.clear();
+    }
 }

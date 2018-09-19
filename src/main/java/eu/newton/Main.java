@@ -16,7 +16,7 @@ public class Main {
         final String f = "sin(pi)+ln(e)";
 
         try {
-            INewtonFunction function = FunctionFlyWeightFactory.getFunction(f);
+            INewtonFunction function = FunctionFlyWeightFactory.getInstance().getFunction(f);
 
             double result;
 

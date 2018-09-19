@@ -99,17 +99,15 @@ public class FunctionSlot extends HBox {
         try {
             INewtonFunction f;
             if (this.n == 0) {
-                f = FunctionFlyWeightFactory.getFunction(input);
+                f = FunctionFlyWeightFactory.getInstance().getFunction(input);
             } else {
-                f = FunctionFlyWeightFactory.getDerivative(input, this.n);
+                f = FunctionFlyWeightFactory.getInstance().getDerivative(input, this.n);
             }
             this.function = f;
             this.forder = this.n;
             this.plotter.plot(f);
         } catch (LambdaCreationException e) {
-            //TODO invalid function
         } catch (IllegalArgumentException ex) {
-            //TODO invalid function
         }
     }
 

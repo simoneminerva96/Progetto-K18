@@ -15,6 +15,7 @@ public class NewtonUI extends Application {
         StackPane root = FXMLLoader.load(getClass().getResource("/fxml/MainView.fxml"));
         Scene scene = new Scene(root, 1280, 720);
 
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Plotter");
         primaryStage.setScene(scene);
         primaryStage.show();

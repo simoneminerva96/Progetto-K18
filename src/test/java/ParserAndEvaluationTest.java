@@ -11,7 +11,7 @@ class ParserAndEvaluationTest {
     @ParameterizedTest
     @CsvFileSource(resources = "functions.csv")
     void testFunction(String function, double expected) throws Exception {
-        INewtonFunction f = FunctionFlyWeightFactory.getFunction(function);
+        INewtonFunction f = FunctionFlyWeightFactory.getInstance().getFunction(function);
         double result = f.evaluate(2.0);
 
         assertEquals(((double) Math.round(expected * 1000)) / 1000, ((double) Math.round(result * 1000)) / 1000);

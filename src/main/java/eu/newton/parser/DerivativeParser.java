@@ -138,13 +138,13 @@ public class DerivativeParser {
             }
 
             if (op.equals("*") || op.equals("/")) {
-                List<String> fucks = new ArrayList<>();
+                List<String> list = new ArrayList<>();
 
                 for (int j = 0; j < groups.size(); j++) {
 
                     LOGGER.trace("Operator M: {} at {}", op, i);
                     LOGGER.trace("Adding C: {} at {}", current, i);
-                    fucks.add(current);
+                    list.add(current);
 
                     current = groups.get(++i);
 
@@ -164,9 +164,9 @@ public class DerivativeParser {
 
                 }
 
-                fucks.add(current);
+                list.add(current);
 
-                builder.append(differentiateMultiply(fucks));
+                builder.append(differentiateMultiply(list));
 
                 if (i == groups.size() - 1) {
                     break;
@@ -245,22 +245,22 @@ public class DerivativeParser {
         return derivative;
     }
 
-    private String differentiateMultiply(List<String> fucks) {
+    private String differentiateMultiply(List<String> list) {
         LOGGER.trace("");
-        LOGGER.trace("Fucks {}", fucks);
+        LOGGER.trace("List {}", list);
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < fucks.size(); i++) {
-            for (int j = 0; j < fucks.size(); j++) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < list.size(); j++) {
                 if (i == j) {
-                    builder.append(differentiate(fucks.get(i)));
+                    builder.append(differentiate(list.get(i)));
                 } else {
-                    builder.append(fucks.get(j));
+                    builder.append(list.get(j));
                 }
-                if (j != fucks.size() - 1) {
+                if (j != list.size() - 1) {
                     builder.append("*");
                 }
             }
-            if (i != fucks.size() - 1) {
+            if (i != list.size() - 1) {
                 builder.append("+");
             }
         }

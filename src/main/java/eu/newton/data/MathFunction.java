@@ -30,10 +30,9 @@ public final class MathFunction implements INewtonFunction {
     public double differentiate(double x, int grade) {
         if (this.derivative == null || this.order != grade) {
             try {
-                this.derivative = FunctionFlyWeightFactory.getDerivative(this.function, grade);
+                this.derivative = FunctionFlyWeightFactory.getInstance().getDerivative(this.function, grade);
                 this.order = grade;
             } catch (LambdaCreationException e) {
-                //TODO couldn't differentiate this function
             }
         }
 

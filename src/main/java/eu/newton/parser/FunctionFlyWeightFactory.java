@@ -8,9 +8,14 @@ import java.util.Map;
 
 public class FunctionFlyWeightFactory {
 
-    private static final Map<String, INewtonFunction> FUNCTIONS = new Object2ObjectOpenHashMap<>();
+    private final Map<String, INewtonFunction> FUNCTIONS = new Object2ObjectOpenHashMap<>();
+    private static final FunctionFlyWeightFactory INSTANCE = new FunctionFlyWeightFactory();
 
-    public static INewtonFunction getFunction(String input) throws LambdaCreationException, IllegalArgumentException {
+    public static FunctionFlyWeightFactory getInstance() {
+        return INSTANCE;
+    }
+
+    public INewtonFunction getFunction(String input) throws LambdaCreationException, IllegalArgumentException {
         INewtonFunction f = FUNCTIONS.get(input);
         if (f == null) {
             f = new FunctionParser().parse(input);
@@ -19,7 +24,7 @@ public class FunctionFlyWeightFactory {
         return f;
     }
 
-    public static INewtonFunction getDerivative(String input, int order) throws LambdaCreationException, IllegalArgumentException {
+    public INewtonFunction getDerivative(String input, int order) throws LambdaCreationException, IllegalArgumentException {
         while (order-- > 0) {
             input = new DerivativeParser().getDerivative(input);
         }

@@ -1,8 +1,5 @@
 package eu.newton.magic;
 
-import eu.newton.magic.clazz.CompilationDetails;
-import eu.newton.magic.dummy.DummyDiagnosticListener;
-import eu.newton.magic.dummy.DummyWriter;
 import eu.newton.magic.exceptions.ClassCompilationException;
 import eu.newton.magic.clazz.ClassSourceJavaObject;
 import eu.newton.magic.clazz.CompiledClassJavaObject;
@@ -34,7 +31,7 @@ public final class LambdaFactory {
 
     private LambdaFactory() {
         this.classLoader = new LambdaClassLoader(new HashMap<>());
-    }
+}
 
     public DoubleUnaryOperator createLambda(String code) throws LambdaCreationException {
         String source = getClassSource(code);
@@ -43,12 +40,13 @@ public final class LambdaFactory {
             this.classCounter++;
 
             Map<String, CompiledClassJavaObject> compiledClass = compileClass(name, source);
-            Class<?> clazz = this.classLoader.loadClass(name, compiledClass);
 
-
-            Method m = clazz.getMethod("getLambda");
-            DoubleUnaryOperator lambda = (DoubleUnaryOperator) m.invoke(null);
-            return lambda;
+            try (LambdaClassLoader classloader = this.classLoader) {
+                Class<?> clazz = this.classLoader.loadClass(name, compiledClass);
+                Method m = clazz.getMethod("getLambda");
+                DoubleUnaryOperator lambda = (DoubleUnaryOperator) m.invoke(null);
+                return lambda;
+            }
         } catch (ReflectiveOperationException | RuntimeException | NoClassDefFoundError e) {
             throw new LambdaCreationException(e);
         } catch (ClassCompilationException ex) {
@@ -65,8 +63,6 @@ public final class LambdaFactory {
                 "}";
     }
 
-    private static final Writer stdErrWriter = new DummyWriter();
-    private static final DiagnosticListener<JavaFileObject> diagnosticsCollector = new DummyDiagnosticListener();
     private Map<String, CompiledClassJavaObject> compileClass(String name, String source) throws ClassCompilationException {
 
         ClassSourceJavaObject classSourceObject = new ClassSourceJavaObject(name, source);
@@ -77,17 +73,12 @@ public final class LambdaFactory {
                     stdFileManager, null,
                     Arrays.asList("-target", "1.8", "-source", "1.8"), null, Collections.singletonList(classSourceObject));
 
-            boolean success;
             try {
-                success = compilationTask.call();
+                compilationTask.call();
             } catch (Throwable t) {
                 throw new ClassCompilationException(t.getCause());
             }
 
-            if (!success) {
-                throw new ClassCompilationException(
-                        new CompilationDetails(name, source, ((DiagnosticCollector<JavaFileObject>) diagnosticsCollector).getDiagnostics(), stdErrWriter.toString()));
-            }
 
             return stdFileManager.getClasses();
         }

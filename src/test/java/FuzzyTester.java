@@ -178,7 +178,7 @@ class FuzzyTester {
     }
 
     private double testParser(String function, double x) throws Exception {
-        INewtonFunction f = FunctionFlyWeightFactory.getFunction(function);
+        INewtonFunction f = FunctionFlyWeightFactory.getInstance().getFunction(function);
         return f.evaluate(x);
     }
 
