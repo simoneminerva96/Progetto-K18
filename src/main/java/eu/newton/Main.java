@@ -23,6 +23,12 @@ public class Main {
             try {
                 result = function.evaluate(7.0);
                 LOGGER.debug("RESULT: {}", result);
+                LOGGER.debug("MAX: {}", function.getMaximum(-10, 10));
+                LOGGER.debug("MIN: {}", function.getMinimum(-10, 10));
+                LOGGER.debug("ZEROES: {}", function.getZeros(-10, 10));
+                LOGGER.debug("Derivative: {}", FunctionFlyWeightFactory.getInstance().getDerivative(function.toString(), 1));
+
+
             } catch (NumberFormatException | ArithmeticException ex) {
                 LOGGER.error(":(");
                 LOGGER.error(ex.getMessage());
